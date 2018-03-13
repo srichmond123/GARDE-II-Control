@@ -86,7 +86,7 @@ public class MakeWordBank : MonoBehaviour {
 		//Find tag with this object:
 		for (int i = 0; i < tags.Length; i++) {
 			if(obj.name == tags[i].text.name) {
-				if (wordBank.Count != 0) {
+				if (sequenceIndex < SEQUENCE.Length) {
 					while (SEQUENCE [sequenceIndex] >= wordBank.Count) {
 						sequenceIndex++; //Prevents index from being out of bounds
 					}
