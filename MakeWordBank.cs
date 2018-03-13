@@ -38,11 +38,11 @@ public class MakeWordBank : MonoBehaviour {
 	public static List<string> wordBank = new List<string>();
 
 	//Array of the container class I made below for a "Tag" object - since it's static, 
-	//you can have an eventlistener on another class and call methods like MakeWordBank.tags[i].setText,
-	//which will change the name of the Tag GameObject and the text of the Text object for that tag..
-	//Also, the List<string> object above is static and can be called in the same way.. To get
-	//new names you should pick index 0 from the List wordBank then call the RemoveAt function
-	//for that index = 0
+	//you can have an eventlistener on another class and call methods like MakeWordBank.replaceTag(GameObject obj)
+	//which replaces the Tag with the next Tag name in line, uploaded from the .csv file.
+	//This script should work fine, the important thing is that the Text objects whose parents are the
+	//tag GameObjects should have unique names (doesn't matter what the names are), the parent
+	//GameObjects' names can be changed though with no problem
 	public static Tag[] tags;
 
 	void Start () {
