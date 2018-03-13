@@ -115,7 +115,7 @@ public class Tag {
 	}
 	public void setText(string next_text) {
 		tag.name = next_text;
-		//text.name = next_text;
+		//text.name = next_text; //The Text Object name acts as the identifier when you click on it and should be unique
 		text.text = next_text;
 	}
 }
