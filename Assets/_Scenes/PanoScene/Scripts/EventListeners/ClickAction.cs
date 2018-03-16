@@ -2,19 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ClickAction : MonoBehaviour, IPointerClickHandler
 {
     StateManager state; // State of the application
 
     private GameObject tagPrefab;
+    private GameObject sphere;
+
     public Material tagMaterial;
 
     public void Start()
     {
         state = GameObject.Find("Canvas").GetComponent<StateManager>();
+
         tagPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
         tagPrefab.transform.localScale = Vector3.zero;
+
+        sphere = GameObject.Find("TagSphere");
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -22,18 +28,33 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         // OnClick code goes here ...
         GameObject objectClicked = eventData.pointerCurrentRaycast.gameObject; // get the object that was pressed
 
+        if (eventData.button != PointerEventData.InputButton.Left) // Ensure the left button was pressed (OR THE FALCON BUTTON)
+        {
+            return;
+        }
+
         if (objectClicked.tag == "Tag") // A tag was pressed
         {
             Debug.Log(objectClicked.name); // Name of the object
+            GameObject currentTag = state.getSelected();
+            if (currentTag != null)
+            {
+                currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
+            }
+            state.setSelected(objectClicked);
+            objectClicked.GetComponent<Text>().color = Color.red;
         }
         else if (objectClicked.tag == "Bin") // The bin was pressed, so we move the tag to the bin
         {
             Debug.Log("Bin Clicked");
+            state.setSelected(null);
+            objectClicked.GetComponent<Text>().color = Color.black;
         }
         else if (objectClicked.tag == "Image") // The image area was pressed, so here we cast a tag onto the sphere
         {
             Debug.Log("Image Clicked");
-            if (true) // TODO: Check if a tag is currently selected
+            GameObject currentTag = state.getSelected();
+            if (currentTag != null) // TODO: Check if a tag is currently selected
             {
                 Vector3 cursorPosition = state.getCursorPosition(); // Use the cursor position to cast a ray onto the sphere
                 Ray ray = Camera.main.ScreenPointToRay(cursorPosition);  // The ray that will be casted onto the sphere
@@ -53,7 +74,30 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                     newObject.transform.LookAt(Vector3.zero); // Make it face the center of the sphere
                     newObject.transform.localScale = new Vector3(0.2f, 0.1f, 0.00001f);
                     newObject.name = "Some Name"; // CHANGE THIS LATER
-                    Debug.Log(hit.point);
+                    newObject.transform.parent = sphere.transform;
+
+                    // Create the object which will hold the TextMesh
+                    GameObject textContainer = new GameObject();
+                    textContainer.transform.parent = newObject.transform;
+                    
+                    // Create the text mesh to be rendered over the plane
+                    TextMesh text = textContainer.AddComponent<TextMesh>();
+                    text.text = currentTag.transform.parent.name;
+                    text.fontSize = 20;
+                    text.alignment = TextAlignment.Center;
+                    text.anchor = TextAnchor.MiddleCenter;
+                    text.name = "Some Other Name";
+                    text.transform.parent = textContainer.transform;
+                    text.transform.localScale = new Vector3(-0.1f, 0.25f, 0.25f);
+                    text.transform.localPosition = Vector3.zero;
+                    text.transform.localEulerAngles = Vector3.zero;
+
+                    MakeWordBank.replaceTag(currentTag);
+                    currentTag.GetComponent<Text>().color = Color.black;
+                    state.setSelected(null);
+
+
+
 
                     // ---- Below is old code used to create the tag whereever the click happened. It isn't being used now but may be useful later
                     // --------------------------------------------------------------------------------------------------------------------------

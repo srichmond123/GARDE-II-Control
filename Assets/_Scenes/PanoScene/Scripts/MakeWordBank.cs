@@ -13,8 +13,12 @@ public class MakeWordBank : MonoBehaviour {
 
 	//For the next two arrays, I drag and dropped the objects from the Editor into the script window in the inspector - 
 	//This script takes that data and automatically makes however many "Tag" objects (class below) are needed:
-	public GameObject[] tagGameObjects;
-	public Text[] textObjects;
+
+    // This has been made private since the tags are the children of the object containing this script
+	private List<GameObject> tagGameObjects;
+
+    // The Text object will be a child of the panel representing that tag, so it is fine to have one array representing the GameObject and the Tag for each tag
+	//public Text[] textObjects;
 
 	//Numbers 0-300 (elements of .csv file) in a random order:
 	public static int[] SEQUENCE = {
@@ -46,9 +50,18 @@ public class MakeWordBank : MonoBehaviour {
 	public static Tag[] tags;
 
 	void Start () {
-		tags = new Tag[tagGameObjects.Length];
+        tagGameObjects = new List<GameObject>();
+        foreach (Transform child in transform)
+        {
+            if (child != transform) // The first child will be the parent transform, which should be excluded
+            {
+                tagGameObjects.Add(child.gameObject);
+            }
+        }
+
+		tags = new Tag[tagGameObjects.Count];
 		for (int i = 0; i < tags.Length; i++) {
-			tags [i] = new Tag (tagGameObjects [i], textObjects [i]);
+			tags [i] = new Tag (tagGameObjects [i], i);
 		}
 		//Read CSV File:
 		using (StreamReader sr = new StreamReader(image1Path))
@@ -106,9 +119,10 @@ public class MakeWordBank : MonoBehaviour {
 public class Tag {
 	public GameObject tag;
 	public Text text;
-	public Tag(GameObject tag, Text text) {
+	public Tag(GameObject tag, int index) {
 		this.tag = tag;
-		this.text = text;
+		this.text = tag.GetComponentInChildren<Text>();
+        this.text.name = "Tag" + index; // Give the Text object an identifier
 	}
 	public string getText() {
 		return text.text;
