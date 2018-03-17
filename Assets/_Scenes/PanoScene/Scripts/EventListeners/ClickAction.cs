@@ -47,8 +47,13 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         else if (objectClicked.tag == "Bin") // The bin was pressed, so we move the tag to the bin
         {
             Debug.Log("Bin Clicked");
+            GameObject currentTag = state.getSelected();
+            if (currentTag != null)
+            {
+                MakeWordBank.replaceTag(currentTag);
+                currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
+            }
             state.setSelected(null);
-            objectClicked.GetComponent<Text>().color = Color.black;
         }
         else if (objectClicked.tag == "Image") // The image area was pressed, so here we cast a tag onto the sphere
         {
