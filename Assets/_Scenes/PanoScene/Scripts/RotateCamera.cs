@@ -14,19 +14,27 @@ public class RotateCamera : MonoBehaviour
 
 	private GameObject cam;
 	private GameObject falcon;
-	private GameObject keyboard;
+    StateManager state; // State of the application
+
+    private Rect cameraBounds;
 
 	private void Start() {
 		this.mousepos = Input.mousePosition; // Tracking the mouse position in case the controller isn't connected
 		this.zoom = 0f;
-		this.buttons = new bool[4]; // Buttons on the Falcon 
+        this.buttons = new bool[] { false, false, false, false };
 
-		this.cam = GameObject.Find("Main Camera");
+        this.cam = GameObject.Find("Main Camera");
+        // Get camera bounds
+        cameraBounds = cam.GetComponent<Camera>().pixelRect;
 
 		if (this.falcon = GameObject.Find("Tip"))
-			this.falconpos = Vector3.zero;
+        {
+            this.falconpos = Vector3.zero;
+        }
 
-		this.panning = false;
+        state = GameObject.Find("Canvas").GetComponent<StateManager>();
+
+        this.panning = false;
 	}
 
 	private void Update()
@@ -49,7 +57,11 @@ public class RotateCamera : MonoBehaviour
 		{
 			FalconUnity.getFalconButtonStates(0, out this.buttons); // Which buttons are currently pressed?
             //Set the new position based on the movement of the controller
-			this.nextpos = new Vector3(base.transform.localEulerAngles.x - (this.falcon.transform.localPosition.y + this.falconpos.y) * this.sensitivity, base.transform.localEulerAngles.y + (this.falcon.transform.localPosition.x - this.falconpos.x) * this.sensitivity, 0f);
+            Vector3 cursorPosition = state.getCursorPosition();
+
+            float newX = transform.localEulerAngles.x - (cursorPosition.y - cameraBounds.center.y) / 1000 * this.sensitivity;
+            float newY = transform.localEulerAngles.y + (cursorPosition.x - cameraBounds.center.x) / 1000 * this.sensitivity;
+            this.nextpos = new Vector3(newX, newY, 0f);
 		}
 
         // Update the zoom

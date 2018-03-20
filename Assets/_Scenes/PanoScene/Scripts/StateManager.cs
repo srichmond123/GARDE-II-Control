@@ -16,6 +16,8 @@ public class StateManager : MonoBehaviour {
     private GameObject falcon; // The instance of the falcon controller
     private GameObject falconCursor; // The cursor being manipulated by the falcon
 
+    private Camera falconCamera;
+
     private Vector3 cursorPosition; // The position of the cursor every frame
 
     public GameObject getSelected()
@@ -39,6 +41,7 @@ public class StateManager : MonoBehaviour {
         if (this.falcon)
         {
             this.falconCursor = GameObject.Find("CursorSphere");
+            this.falconCamera = GameObject.Find("CursorCamera").GetComponent<Camera>();
         }
     }
 
@@ -46,7 +49,7 @@ public class StateManager : MonoBehaviour {
     {
         if (this.falcon) // Update the cursor position every frame
         {
-            this.cursorPosition = Camera.main.WorldToScreenPoint(this.falconCursor.transform.position);
+            this.cursorPosition = falconCamera.WorldToScreenPoint(this.falconCursor.transform.position);
         }
         else
         {
