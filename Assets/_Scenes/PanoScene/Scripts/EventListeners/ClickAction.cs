@@ -50,7 +50,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             GameObject currentTag = state.getSelected();
             if (currentTag != null)
             {
-                MakeWordBank.replaceTag(currentTag);
+                MakeWordBank.replaceTag(currentTag, false);
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
             state.setSelected(null);
@@ -59,7 +59,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log("Image Clicked");
             GameObject currentTag = state.getSelected();
-            if (currentTag != null) // TODO: Check if a tag is currently selected
+			if (currentTag != null && !currentTag.transform.parent.name.Equals("")) // TODO: Check if a tag is currently selected and that the tag isn't blank
             {
                 Vector3 cursorPosition = state.getCursorPosition(); // Use the cursor position to cast a ray onto the sphere
                 Ray ray = Camera.main.ScreenPointToRay(cursorPosition);  // The ray that will be casted onto the sphere
@@ -75,31 +75,31 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 Debug.DrawRay(ray.origin, ray.direction, Color.red, 5);
                 if (Physics.Raycast(ray, out hit))
                 {
-                    GameObject newObject = Instantiate(tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
-                    newObject.transform.LookAt(Vector3.zero); // Make it face the center of the sphere
-                    newObject.transform.localScale = new Vector3(0.2f, 0.1f, 0.00001f);
-                    newObject.name = "Some Name"; // CHANGE THIS LATER
-                    newObject.transform.parent = sphere.transform;
+					GameObject newObject = Instantiate (tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
+					newObject.transform.LookAt (Vector3.zero); // Make it face the center of the sphere
+					newObject.transform.localScale = new Vector3 (0.2f, 0.1f, 0.00001f);
+					newObject.name = "Some Name"; // CHANGE THIS LATER
+					newObject.transform.parent = sphere.transform;
 
-                    // Create the object which will hold the TextMesh
-                    GameObject textContainer = new GameObject();
-                    textContainer.transform.parent = newObject.transform;
-                    
-                    // Create the text mesh to be rendered over the plane
-                    TextMesh text = textContainer.AddComponent<TextMesh>();
-                    text.text = currentTag.transform.parent.name;
-                    text.fontSize = 20;
-                    text.alignment = TextAlignment.Center;
-                    text.anchor = TextAnchor.MiddleCenter;
-                    text.name = "Some Other Name";
-                    text.transform.parent = textContainer.transform;
-                    text.transform.localScale = new Vector3(-0.1f, 0.25f, 0.25f);
-                    text.transform.localPosition = Vector3.zero;
-                    text.transform.localEulerAngles = Vector3.zero;
+					// Create the object which will hold the TextMesh
+					GameObject textContainer = new GameObject ();
+					textContainer.transform.parent = newObject.transform;
+                
+					// Create the text mesh to be rendered over the plane
+					TextMesh text = textContainer.AddComponent<TextMesh> ();
+					text.text = currentTag.transform.parent.name;
+					text.fontSize = 20;
+					text.alignment = TextAlignment.Center;
+					text.anchor = TextAnchor.MiddleCenter;
+					text.name = "Some Other Name";
+					text.transform.parent = textContainer.transform;
+					text.transform.localScale = new Vector3 (-0.1f, 0.25f, 0.25f);
+					text.transform.localPosition = Vector3.zero;
+					text.transform.localEulerAngles = Vector3.zero;
 
-                    MakeWordBank.replaceTag(currentTag);
-                    currentTag.GetComponent<Text>().color = Color.black;
-                    state.setSelected(null);
+					MakeWordBank.replaceTag (currentTag, true);
+					currentTag.GetComponent<Text> ().color = Color.black;
+					state.setSelected (null);
 
 
 
