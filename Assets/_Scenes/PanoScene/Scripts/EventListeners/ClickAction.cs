@@ -18,6 +18,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         state = GameObject.Find("Canvas").GetComponent<StateManager>();
 
         tagPrefab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+		tagPrefab.name = "TagPrefab"; //So it can be destroyed
         tagPrefab.transform.localScale = Vector3.zero;
 
         sphere = GameObject.Find("TagSphere");
