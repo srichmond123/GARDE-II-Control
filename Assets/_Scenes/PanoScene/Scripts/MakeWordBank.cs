@@ -157,6 +157,10 @@ public class MakeWordBank : MonoBehaviour {
 					/*for (int prefabIndex = 0; prefabIndex < 5; prefabIndex++) {
 						Destroy (GameObject.Find ("TagPrefab").GetComponent<Renderer>());
 					}*/
+                    foreach(Transform t in GameObject.Find("TagSphere").transform)
+                    {
+                        Destroy(t.gameObject);
+                    }
 					numTagsRemaining = 5;
 					tagsRemainingText.text = numTagsRemaining + " Tags Left";
 					imageIndex++;

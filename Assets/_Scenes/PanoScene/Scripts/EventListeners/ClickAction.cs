@@ -38,7 +38,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         {
             Debug.Log(objectClicked.name); // Name of the object
             GameObject currentTag = state.getSelected();
-            if (currentTag != null)
+            if (currentTag != null && currentTag.GetComponent<Text>() != null)
             {
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
