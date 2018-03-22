@@ -9,6 +9,7 @@ TagManager:
   - Image
   - TagsRemainingText
   - TagSphere
+  - QuitButton
   layers:
   - Default
   - TransparentFX

@@ -12,7 +12,7 @@ public class QuitGameScript : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void TaskOnClick () {
+	public static void TaskOnClick () {
 		Application.Quit();
 		Debug.Log ("QUITTING");
 	}
