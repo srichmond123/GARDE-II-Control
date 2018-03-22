@@ -150,11 +150,13 @@ public class MakeWordBank : MonoBehaviour {
 				if (numTagsRemaining == 1) {
 					tagsRemainingText.text = numTagsRemaining + " Tag Left";
 				} else {
+
+                    DataCollector.Flush();
 					if (imageIndex == imageMaterials.Length - 1) { //On last image, then quit:
 						Application.Quit ();
 					}
-					//Turnover image, delete tags left out on image:
-					/*for (int prefabIndex = 0; prefabIndex < 5; prefabIndex++) {
+                    //Turnover image, delete tags left out on image:
+                    /*for (int prefabIndex = 0; prefabIndex < 5; prefabIndex++) {
 						Destroy (GameObject.Find ("TagPrefab").GetComponent<Renderer>());
 					}*/
                     foreach(Transform t in GameObject.Find("TagSphere").transform)

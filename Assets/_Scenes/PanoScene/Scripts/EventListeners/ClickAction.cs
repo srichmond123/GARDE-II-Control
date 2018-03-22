@@ -43,7 +43,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
             state.setSelected(objectClicked);
-            objectClicked.GetComponent<Text>().color = Color.red;
+            objectClicked.GetComponentInChildren<Text>().color = Color.red;
         }
         else if (objectClicked.tag == "QuitButton") // Quit button clicked by falcon
         {
