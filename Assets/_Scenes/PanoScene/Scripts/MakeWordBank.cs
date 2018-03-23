@@ -159,7 +159,7 @@ public class MakeWordBank : MonoBehaviour {
 					}*/
                     foreach(Transform t in GameObject.Find("TagSphere").transform)
                     {
-                        Destroy(t.gameObject);
+                        Destroy(t.gameObject, 0.08f);
                     }
 					numTagsRemaining = 5;
 					tagsRemainingText.text = numTagsRemaining + " Tags Left";
