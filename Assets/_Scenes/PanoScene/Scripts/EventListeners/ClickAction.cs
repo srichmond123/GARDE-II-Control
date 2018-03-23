@@ -43,7 +43,11 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
             state.setSelected(objectClicked);
-            objectClicked.GetComponent<Text>().color = Color.red;
+            objectClicked.GetComponentInChildren<Text>().color = Color.red;
+        }
+        else if (objectClicked.tag == "QuitButton") // Quit button clicked by falcon
+        {
+            QuitGameScript.TaskOnClick();
         }
         else if (objectClicked.tag == "Bin") // The bin was pressed, so we move the tag to the bin
         {
@@ -78,8 +82,8 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 {
 					GameObject newObject = Instantiate (tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
 					newObject.transform.LookAt (Vector3.zero); // Make it face the center of the sphere
-					newObject.transform.localScale = new Vector3 (0.2f, 0.1f, 0.00001f);
-					newObject.name = "Some Name"; // CHANGE THIS LATER
+					newObject.transform.localScale = new Vector3 (0.25f, 0.1f, 0.00001f);
+					newObject.name = currentTag.transform.parent.name; // CHANGE THIS LATER
 					newObject.transform.parent = sphere.transform;
 
 					// Create the object which will hold the TextMesh
@@ -92,9 +96,9 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					text.fontSize = 20;
 					text.alignment = TextAlignment.Center;
 					text.anchor = TextAnchor.MiddleCenter;
-					text.name = "Some Other Name";
+					text.name = currentTag.transform.parent.name + "_Text";
 					text.transform.parent = textContainer.transform;
-					text.transform.localScale = new Vector3 (-0.1f, 0.25f, 0.25f);
+					text.transform.localScale = new Vector3 (-0.075f, 0.25f, 0.25f);
 					text.transform.localPosition = Vector3.zero;
 					text.transform.localEulerAngles = Vector3.zero;
 
