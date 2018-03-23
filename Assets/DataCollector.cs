@@ -12,11 +12,11 @@ public class DataCollector : MonoBehaviour
     static int numTagsRemaining = 5;
     static int userID = 0;
 
-    static float elapsedTime;
+    static float elapsedTime; // Running time of the app
 
-    static List<float> times;
-    static List<Vector3> cameraRot;
-    static List<Vector3> falconPos;
+    static List<float> times; // Time of each logged frame
+    static List<Vector3> cameraRot; // The angle of the camera at the logged frame
+    static List<Vector3> falconPos; // The position of the Falcon joystick at the logged frame
 
     static Vector3 tempPos;
 
@@ -65,11 +65,11 @@ public class DataCollector : MonoBehaviour
         Directory.CreateDirectory(userPath);
 
         // Log tag data
-        string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name;
+        string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name; // Name of the image file
         string path = userPath + imgName + ".csv";
-        new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
-        StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
-        streamWriter.Write("posx, posy, posz, tag, userID\n");
+        new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close(); // Create the file
+        StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);         // Open the file
+        streamWriter.Write("posx, posy, posz, tag, userID\n");                            // Write header line to the file
         foreach (Transform t in tagTransform)
         {
             if (t != tagTransform)
@@ -83,7 +83,7 @@ public class DataCollector : MonoBehaviour
                 streamWriter.Write(line);
             }
         }
-        streamWriter.Close();
+        streamWriter.Close(); // Close the file after writing
 
         // Log all of falcon/camera data
         path = userPath + "panData.csv";
