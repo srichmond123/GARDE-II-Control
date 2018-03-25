@@ -18,6 +18,8 @@ public class DataCollector : MonoBehaviour
     static List<Vector3> cameraRot; // The angle of the camera at the logged frame
     static List<Vector3> falconPos; // The position of the Falcon joystick at the logged frame
 
+	static List<TagInfo> tagInfo;
+
     static Vector3 tempPos;
 
     static GameObject cam;
@@ -37,39 +39,47 @@ public class DataCollector : MonoBehaviour
         elapsedTime = 0f;
         Directory.CreateDirectory(dataPath);
         userID = Directory.GetDirectories(dataPath).Length;
+
+		tagInfo = new List<TagInfo> ();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!falcon) // There's no falcon, so no data collection
-        {
-            return;
-        }
         elapsedTime += Time.deltaTime;
         times.Add(elapsedTime);
         cameraRot.Add(cam.transform.localEulerAngles);
-        FalconUnity.getTipPosition(0, out tempPos);
-        falconPos.Add(tempPos);
+
+		if (falcon)
+		{
+			FalconUnity.getTipPosition(0, out tempPos);
+			falconPos.Add(tempPos);
+		}
     }
 
     public static void Flush() // Write current data to csv file
     {
+		/*
         if (!falcon)
         {
             return;
         }
+        */
         Debug.Log("FLUSHING");
+		//I'm doing this in the AddTag method so it writes to memory for each tag added:
         Transform tagTransform = GameObject.Find("TagSphere").transform; // Tag Container
+
         string userPath = dataPath + "User-" + userID + '/';
         Directory.CreateDirectory(userPath);
 
         // Log tag data
         string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name; // Name of the image file
-        string path = userPath + imgName + ".csv";
-        new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close(); // Create the file
-        StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);         // Open the file
-        streamWriter.Write("posx, posy, posz, tag, userID\n");                            // Write header line to the file
+        //string path = userPath + imgName + ".csv";
+        //new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close(); // Create the file
+        //StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);         // Open the file
+		//streamWriter.Write("posx, posy, posz, tag, time (s), userID\n");   // Write header line to the file
+
+		/*
         foreach (Transform t in tagTransform)
         {
             if (t != tagTransform)
@@ -77,30 +87,87 @@ public class DataCollector : MonoBehaviour
                 Vector3 position = t.gameObject.GetComponent<Renderer>().bounds.center;
                 string line = position.x.ToString() + "," +
                               position.y.ToString() + "," + 
-                              position.x.ToString() + "," +
+                              position.z.ToString() + "," +
                               t.gameObject.name + "," + 
                               userID.ToString() + "\n";
                 streamWriter.Write(line);
             }
         }
+		foreach (TagInfo tg in tagInfo) {
+			string line = tg.position.x.ToString () + "," +
+			              tg.position.y.ToString () + "," +
+			              tg.position.z.ToString () + "," +
+			              tg.name + "," +
+						  tg.timeStamp.ToString() + "," + 
+			              tg.userID.ToString () + "\n";
+			streamWriter.Write (line);
+		}
         streamWriter.Close(); // Close the file after writing
 
-        // Log all of falcon/camera data
-        path = userPath + "panData.csv";
+		*/
+
+        // Log all of falcon/camera data - should this only happen during image turnover?
+        string path = userPath + "panData.csv";
 
         new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
-        streamWriter = new StreamWriter(path, true, Encoding.ASCII);
-        streamWriter.Write("time, rotation.x, rotation.y, falcon.x, falcon.y\n");
+        StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
+		streamWriter.Write("time (s), rotation.x, rotation.y, falcon.x, falcon.y\n");
         for (int i = 0; i < times.Count; i++)
         {
-            string line = times[i].ToString() + "," +
-                          cameraRot[i].x.ToString() + "," + cameraRot[i].y.ToString() + "," +
-                          falconPos[i].x.ToString() + "," + falconPos[i].y.ToString() + "\n";
+			string line = times [i].ToString () + "," +
+			                       cameraRot [i].x.ToString () + "," + cameraRot [i].y.ToString ();
+			if (falcon) {
+				line += "," + falconPos [i].x.ToString () + "," + falconPos [i].y.ToString () + "\n";
+			} else {
+				line += "\n";
+			}
             streamWriter.Write(line);
         }
         streamWriter.Close();
         times.Clear();
         cameraRot.Clear();
         falconPos.Clear();
+
+		tagInfo.Clear ();
     }
+
+	public static void AddTag(string name, Vector3 position = new Vector3()) {
+		TagInfo nTagInfo;
+		nTagInfo.position = position;
+		nTagInfo.name = name;
+		nTagInfo.userID = userID;
+		nTagInfo.timeStamp = elapsedTime;
+		tagInfo.Add (nTagInfo);
+
+		//Write to memory here instead of Flush() :
+
+		Transform tagTransform = GameObject.Find("TagSphere").transform;
+		string userPath = dataPath + "User-" + userID + '/';
+		Directory.CreateDirectory(userPath);
+
+		// Log tag data
+		string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name; // Name of the image file
+		string path = userPath + imgName + ".csv";
+		new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Write).Close(); // Create the file, set to FileMode.Create so it overwrites each time
+		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);         // Open the file
+		streamWriter.Write("posx, posy, posz, tag, time (s), userID\n");
+
+		foreach (TagInfo tg in tagInfo) {
+			string line = tg.position.x.ToString () + "," +
+				tg.position.y.ToString () + "," +
+				tg.position.z.ToString () + "," +
+				tg.name + "," +
+				tg.timeStamp.ToString() + "," + 
+				tg.userID.ToString () + "\n";
+			streamWriter.Write (line);
+		}
+		streamWriter.Close(); // Close the file after writing
+	}
 }
+
+public struct TagInfo {
+	public Vector3 position;
+	public string name;
+	public int userID;
+	public float timeStamp;
+};

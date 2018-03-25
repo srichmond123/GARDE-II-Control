@@ -102,11 +102,11 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					text.transform.localPosition = Vector3.zero;
 					text.transform.localEulerAngles = Vector3.zero;
 
+					DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
+
 					MakeWordBank.replaceTag (currentTag, true);
 					currentTag.GetComponent<Text> ().color = Color.black;
 					state.setSelected (null);
-
-
 
 
                     // ---- Below is old code used to create the tag whereever the click happened. It isn't being used now but may be useful later
