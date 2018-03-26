@@ -25,8 +25,10 @@ public class DataCollector : MonoBehaviour
     static GameObject cam;
 
     static string dataPath = "Data/";
+	static string userPath = "";
 
     static bool falcon; // Is the controller on?
+	static bool writtenPanDataColumnNames = false;
 
     // Use this for initialization
     void Start()
@@ -41,20 +43,46 @@ public class DataCollector : MonoBehaviour
         userID = Directory.GetDirectories(dataPath).Length;
 
 		tagInfo = new List<TagInfo> ();
+
+		userPath = dataPath + "User-" + userID + '/';
+		Directory.CreateDirectory(userPath);
     }
 
     // Update is called once per frame
     void Update()
     {
         elapsedTime += Time.deltaTime;
-        times.Add(elapsedTime);
-        cameraRot.Add(cam.transform.localEulerAngles);
+        //times.Add(elapsedTime);
+        //cameraRot.Add(cam.transform.localEulerAngles);
 
 		if (falcon)
 		{
 			FalconUnity.getTipPosition(0, out tempPos);
 			falconPos.Add(tempPos);
 		}
+
+		string path = userPath + "panData.csv";
+
+		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
+		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
+		if (!writtenPanDataColumnNames) { //Only write this once:
+			streamWriter.Write ("time (s), rotation.x, rotation.y, falcon.x, falcon.y\n");
+			writtenPanDataColumnNames = true;
+		}
+		string line = elapsedTime.ToString () + "," +
+			cam.transform.localEulerAngles.x.ToString () + "," + cam.transform.localEulerAngles.y.ToString ();
+		if (falcon) {
+			line += "," + tempPos.x.ToString () + "," + tempPos.y.ToString () + "\n";
+		} else {
+			line += "\n";
+		}
+		streamWriter.Write(line);
+		streamWriter.Close();
+		/* Not needed if it's writing every frame:
+		times.Clear();
+		cameraRot.Clear();
+		falconPos.Clear();
+		*/
     }
 
     public static void Flush() // Write current data to csv file
@@ -64,8 +92,8 @@ public class DataCollector : MonoBehaviour
         {
             return;
         }
-        */
-        Debug.Log("FLUSHING");
+
+        //Debug.Log("FLUSHING");
 		//I'm doing this in the AddTag method so it writes to memory for each tag added:
         Transform tagTransform = GameObject.Find("TagSphere").transform; // Tag Container
 
@@ -73,13 +101,13 @@ public class DataCollector : MonoBehaviour
         Directory.CreateDirectory(userPath);
 
         // Log tag data
-        string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name; // Name of the image file
+        //string imgName = tagTransform.gameObject.GetComponent<Renderer>().material.name; // Name of the image file
         //string path = userPath + imgName + ".csv";
         //new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close(); // Create the file
         //StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);         // Open the file
 		//streamWriter.Write("posx, posy, posz, tag, time (s), userID\n");   // Write header line to the file
 
-		/*
+		
         foreach (Transform t in tagTransform)
         {
             if (t != tagTransform)
@@ -104,7 +132,7 @@ public class DataCollector : MonoBehaviour
 		}
         streamWriter.Close(); // Close the file after writing
 
-		*/
+		
 
         // Log all of falcon/camera data - should this only happen during image turnover?
         string path = userPath + "panData.csv";
@@ -127,7 +155,9 @@ public class DataCollector : MonoBehaviour
         times.Clear();
         cameraRot.Clear();
         falconPos.Clear();
+		*/
 
+		//Only part that should remain from .Flush() method called on image turnover:
 		tagInfo.Clear ();
     }
 

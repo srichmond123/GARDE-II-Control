@@ -55,6 +55,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             GameObject currentTag = state.getSelected();
             if (currentTag != null)
             {
+				DataCollector.AddTag(currentTag.transform.parent.name);
                 MakeWordBank.replaceTag(currentTag, false);
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
