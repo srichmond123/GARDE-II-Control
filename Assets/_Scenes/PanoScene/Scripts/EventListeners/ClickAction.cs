@@ -106,7 +106,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
 
 					MakeWordBank.replaceTag (currentTag, true);
-					currentTag.GetComponent<Text> ().color = Color.black;
+					currentTag.GetComponentInChildren<Text>().color = Color.black;
 					state.setSelected (null);
 
 
