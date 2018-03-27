@@ -34,12 +34,12 @@ public class FalconPointer : PointerInputModule
         if (falcon)
         {
             FalconUnity.getFalconButtonStates(0, out this.buttons); // Which buttons are currently pressed?
-            if (!prevClick && this.buttons[3])
+            if (!prevClick && (this.buttons[3] || buttons[1]))
             {
                 Process();
                 eventListener.OnPointerClick(GetFalconEventData());
             }
-            prevClick = this.buttons[3];
+            prevClick = (this.buttons[3] || buttons[1]);
         }
     }
 
