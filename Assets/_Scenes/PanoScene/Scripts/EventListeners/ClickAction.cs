@@ -10,6 +10,9 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 
     private GameObject tagPrefab;
     private GameObject sphere;
+	private GameObject canvas;
+
+	private GameObject cursorTag; //Tag that follows cursor
 
     public Material tagMaterial;
 
@@ -22,7 +25,22 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
         tagPrefab.transform.localScale = Vector3.zero;
 
         sphere = GameObject.Find("TagSphere");
+		canvas = GameObject.Find ("Canvas");
     }
+
+	//This method is only needed when the user has clicked a tag, and the instantiated GameObject tag needs to follow the cursor:
+	public void Update() {
+		if (cursorTag != null) {
+			//cursorTag.transform.position 
+			//= new Vector3 (state.getCursorPosition().x, state.getCursorPosition().y, canvas.transform.position.z - 0.5f);
+			cursorTag.transform.localScale = new Vector3 (-1f, 1f, 0.001f);
+			Vector2 pos;
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, Camera.current, out pos);
+			cursorTag.transform.position = canvas.transform.TransformPoint(pos);
+			cursorTag.transform.position 
+			= new Vector3 (cursorTag.transform.position.x, cursorTag.transform.position.y, canvas.transform.position.z - 0.25f);
+		}
+	}
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -44,6 +62,14 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             }
             state.setSelected(objectClicked);
             objectClicked.GetComponentInChildren<Text>().color = Color.red;
+
+			//Make tag that follows cursor:
+			cursorTag = Instantiate (state.getSelected().transform.parent.gameObject, canvas.transform);
+			cursorTag.transform.LookAt (Vector3.zero);
+			cursorTag.transform.Rotate (new Vector3 (0f, 0f, -3f));
+			cursorTag.layer = 5; //UI Layer
+			//cursorTag.name = currentTag.GetComponent<Text> ().name;
+			//cursorTag.transform.localScale = new Vector3 (8.8f, 3.188f, 0.001f);
         }
         else if (objectClicked.tag == "QuitButton") // Quit button clicked by falcon
         {
@@ -59,6 +85,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 MakeWordBank.replaceTag(currentTag, false);
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
+			if (cursorTag != null) {
+				Destroy(cursorTag);
+				cursorTag = null;
+			}
             state.setSelected(null);
         }
         else if (objectClicked.tag == "Image") // The image area was pressed, so here we cast a tag onto the sphere
@@ -81,6 +111,8 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 Debug.DrawRay(ray.origin, ray.direction, Color.red, 5);
                 if (Physics.Raycast(ray, out hit))
                 {
+					Destroy(cursorTag);
+					cursorTag = null;
 					GameObject newObject = Instantiate (tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
 					newObject.transform.LookAt (Vector3.zero); // Make it face the center of the sphere
 					newObject.transform.localScale = new Vector3 (0.25f, 0.1f, 0.00001f);
