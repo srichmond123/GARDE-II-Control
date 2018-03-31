@@ -63,6 +63,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             state.setSelected(objectClicked);
             objectClicked.GetComponentInChildren<Text>().color = Color.red;
 
+			if (cursorTag != null) {
+				Destroy (cursorTag);
+			}
+
 			//Make tag that follows cursor:
 			cursorTag = Instantiate (state.getSelected().transform.parent.gameObject, canvas.transform);
 			cursorTag.transform.LookAt (Vector3.zero);
