@@ -13,6 +13,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 	private GameObject canvas;
 
 	private GameObject cursorTag; //Tag that follows cursor
+    private GameObject cursorSphere; // Falcon cursor
 
     public Material tagMaterial;
 
@@ -26,6 +27,8 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 
         sphere = GameObject.Find("TagSphere");
 		canvas = GameObject.Find ("Canvas");
+
+        cursorSphere = GameObject.Find("CursorSphere");
     }
 
 	//This method is only needed when the user has clicked a tag, and the instantiated GameObject tag needs to follow the cursor:
@@ -35,10 +38,9 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			//= new Vector3 (state.getCursorPosition().x, state.getCursorPosition().y, canvas.transform.position.z - 0.5f);
 			cursorTag.transform.localScale = new Vector3 (-1f, 1f, 0.001f);
 			Vector2 pos;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, Input.mousePosition, Camera.current, out pos);
-			cursorTag.transform.position = canvas.transform.TransformPoint(pos);
-			cursorTag.transform.position 
-			= new Vector3 (cursorTag.transform.position.x, cursorTag.transform.position.y, canvas.transform.position.z - 0.25f);
+			RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, state.getCursorPosition(), Camera.current, out pos);
+			cursorTag.transform.position = canvas.transform.TransformPoint(pos) + Vector3.back * -0.25f;
+            cursorTag.transform.LookAt(cursorTag.transform.position + Vector3.back * cursorTag.transform.position.z);
 		}
 	}
 
@@ -72,6 +74,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			cursorTag.transform.LookAt (Vector3.zero);
 			cursorTag.transform.Rotate (new Vector3 (0f, 0f, -3f));
 			cursorTag.layer = 5; //UI Layer
+            if (cursorSphere != null)
+            {
+                cursorSphere.GetComponent<MeshRenderer>().enabled = false;
+            }
 			//cursorTag.name = currentTag.GetComponent<Text> ().name;
 			//cursorTag.transform.localScale = new Vector3 (8.8f, 3.188f, 0.001f);
         }
@@ -92,7 +98,11 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			if (cursorTag != null) {
 				Destroy(cursorTag);
 				cursorTag = null;
-			}
+                if (cursorSphere != null)
+                {
+                    cursorSphere.GetComponent<MeshRenderer>().enabled = true;
+                }
+            }
             state.setSelected(null);
         }
         else if (objectClicked.tag == "Image") // The image area was pressed, so here we cast a tag onto the sphere
@@ -117,7 +127,11 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
                 {
 					Destroy(cursorTag);
 					cursorTag = null;
-					GameObject newObject = Instantiate (tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
+                    if (cursorSphere != null)
+                    {
+                        cursorSphere.GetComponent<MeshRenderer>().enabled = true;
+                    }
+                    GameObject newObject = Instantiate (tagPrefab, hit.point * 0.95f, Quaternion.identity); // Create the new object using the tagPrefab
 					newObject.transform.LookAt (Vector3.zero); // Make it face the center of the sphere
 					newObject.transform.localScale = new Vector3 (0.25f, 0.1f, 0.00001f);
 					newObject.name = currentTag.transform.parent.name; // CHANGE THIS LATER

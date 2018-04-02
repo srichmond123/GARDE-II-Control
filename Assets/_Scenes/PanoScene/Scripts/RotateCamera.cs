@@ -77,7 +77,7 @@ public class RotateCamera : MonoBehaviour
 			this.nextpos.x = 35f;
 		}
 
-        // If the pan button is pressed (right click on mouse, or left button on controller), update the camera rotation
+        // If the pan button is pressed (right click on mouse, or left button on controller), update the camera rotations
 		if ((this.falcon && this.buttons[0]) || Input.GetMouseButton(1))
 		{
 			base.transform.localEulerAngles = this.nextpos;
