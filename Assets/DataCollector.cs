@@ -66,13 +66,13 @@ public class DataCollector : MonoBehaviour
 		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
 		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
 		if (!writtenPanDataColumnNames) { //Only write this once:
-			streamWriter.Write ("time (s), rotation.x, rotation.y, falcon.x, falcon.y\n");
+			streamWriter.Write ("time (s), rotation.x, rotation.y, falcon.x, falcon.y, falcon.z\n");
 			writtenPanDataColumnNames = true;
 		}
 		string line = elapsedTime.ToString () + "," +
 			cam.transform.localEulerAngles.x.ToString () + "," + cam.transform.localEulerAngles.y.ToString ();
 		if (falcon) {
-			line += "," + tempPos.x.ToString () + "," + tempPos.y.ToString () + "\n";
+			line += "," + tempPos.x.ToString () + "," + tempPos.y.ToString () + tempPos.z.ToString() + "\n";
 		} else {
 			line += "\n";
 		}
