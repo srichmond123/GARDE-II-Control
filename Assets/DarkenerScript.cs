@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +9,8 @@ public class DarkenerScript : MonoBehaviour {
 	static float scrollPos = 0f;
 	static Image image;
 	static GameObject camera;
+
+    float z = 0.2f;
 
     Vector3 falconPos;
     GameObject falcon;
@@ -31,7 +34,8 @@ public class DarkenerScript : MonoBehaviour {
         else
         {
             FalconUnity.getTipPosition(0, out falconPos);
-            scrollPos = falconPos.z * 0.5f;
+            scrollPos = (float)Math.Tanh(z - (Mathf.Max(z, Mathf.Abs(falconPos.z))));  // * 0.5f;
+
         }
 
 

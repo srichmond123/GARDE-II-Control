@@ -6,7 +6,7 @@ using UnityEngine;
 public class PushToZ : MonoBehaviour {
 
     Vector3 pos;
-    public int k = 50;
+    public int k = 24;
 
     void push()
     {
