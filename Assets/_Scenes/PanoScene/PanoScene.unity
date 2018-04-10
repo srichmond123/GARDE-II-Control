@@ -2163,7 +2163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66cd683d7e7075147aec4e349d6cd519, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  k: 24
+  k: 18
 --- !u!1 &1139364821
 GameObject:
   m_ObjectHideFlags: 0
@@ -2612,7 +2612,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 2100000, guid: 17278dbad5ffd364e9e4c45c0beaf1f9, type: 2}
+  - {fileID: 2100000, guid: 66d0574049538454ab9138eb456c6aa2, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

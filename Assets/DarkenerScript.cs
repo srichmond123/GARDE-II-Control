@@ -35,7 +35,6 @@ public class DarkenerScript : MonoBehaviour {
         {
             FalconUnity.getTipPosition(0, out falconPos);
             scrollPos = (float)Math.Tanh(z - (Mathf.Max(z, Mathf.Abs(falconPos.z))));  // * 0.5f;
-
         }
 
 
@@ -46,6 +45,6 @@ public class DarkenerScript : MonoBehaviour {
 		ViewConeScript.modifyRotation (-camera.transform.localEulerAngles.y);
 
 		//With the falcon, the part "Mathf.Abs(1.0f + scrollPos)" can just be changed to "falcon.z / 2.0f + 1.0" (ranges from 0.5f to 1.5f scale)
-		ViewConeScript.modifyScale (Mathf.Abs(1.0f + scrollPos / 2.0f));
+		ViewConeScript.modifyScale (1.0f + falconPos.z / 2.0f);
 	}
 }
