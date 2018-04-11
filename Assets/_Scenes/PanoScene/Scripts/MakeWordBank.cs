@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.IO;
+using UnityEngine.EventSystems;
 
 public class MakeWordBank : MonoBehaviour {
 
@@ -10,7 +11,8 @@ public class MakeWordBank : MonoBehaviour {
 	//Using the final wordbank Roni gave me:
 
 	static string image1Path = "Assets/Tags/wordbank.csv";
-		private List<GameObject> tagGameObjects;
+	private List<GameObject> tagGameObjects;
+	StateManager state; //For tutorial only
 
     // The Text object will be a child of the panel representing that tag, so it is fine to have one array representing the GameObject and the Tag for each tag
 	//public Text[] textObjects;
@@ -128,12 +130,23 @@ public class MakeWordBank : MonoBehaviour {
 
 
 	public static GameObject tagSphere;
-	public Material[] imageMaterialsToDragIn; 
+	public Material[] imageMaterialsToDragIn;
+	public Material tutorialImageMaterialDragFromEditor;
+	public static Material tutorialImageMaterial;
 	public static Material[] imageMaterials;
 
 	public static Text tagsRemainingText;
 
 	public static List<string> wordBank = new List<string>();
+	public static GameObject focusor;
+	public static GameObject falconHelper; //So when the focus window goes to the button it doesn't depend on absolute coordinates
+	public static Text tutorialText;
+	public static GameObject dataCollector;
+	public static bool inTutorial = true;
+	public static int stepOfTutorial = 0;
+	public static float timePannedInTutorial = 0f;
+	public static float timeSpentPerSelectButton = 0f; //The focus window will switch back and forth between the 2 select buttons
+	public static bool switchRight = true; //For the Select button part of the tutorial
 
 	//Array of the container class I made below for a "Tag" object - since it's static, 
 	//you can have an eventlistener on another class and call methods like MakeWordBank.replaceTag(GameObject obj)
@@ -146,6 +159,11 @@ public class MakeWordBank : MonoBehaviour {
 	void Start () {
 		tagSphere = GameObject.FindGameObjectWithTag ("TagSphere");
 		imageMaterials = new Material[imageMaterialsToDragIn.Length];
+		tutorialImageMaterial = tutorialImageMaterialDragFromEditor;
+		focusor = GameObject.FindGameObjectWithTag ("Focusor");
+		falconHelper = GameObject.FindGameObjectWithTag ("FalconHelper");
+		state = GameObject.Find("Canvas").GetComponent<StateManager>();
+		tutorialText = GameObject.FindGameObjectWithTag ("TutorialText").GetComponent<Text> () as Text;
 		for (int i = 0; i < imageMaterials.Length; i++) {
 			imageMaterials [i] = imageMaterialsToDragIn [i];
 		}
@@ -181,17 +199,190 @@ public class MakeWordBank : MonoBehaviour {
 		}
 		wordBank.RemoveAt (0); //<-- Column name
 
-		// **************** IMAGE 1: *******************************
+		// **************** TUTORIAL: ******************************
+		///
+		/// 
+		//////// 
+		dataCollector = GameObject.FindGameObjectWithTag("DataCollector"); //Turn off data collection for tutorial
+		dataCollector.SetActive(false);
+
+		tagSphere.GetComponent<Renderer> ().material = tutorialImageMaterial;
 		for (int i = 0; i < tags.Length; i++) {
 			tags[i].setText(wordBank [ SEQUENCE[imageIndex, sequenceIndex] ]);
 			sequenceIndex++;
 		}
-		tagSphere.GetComponent<Renderer> ().material = imageMaterials [imageIndex];
+		////////
+		/// 
+		/// 
+		// **************** IMAGE 1: *******************************
+		/*for (int i = 0; i < tags.Length; i++) {
+			tags[i].setText(wordBank [ SEQUENCE[imageIndex, sequenceIndex] ]);
+			sequenceIndex++;
+		}
+		tagSphere.GetComponent<Renderer> ().material = imageMaterials [imageIndex];*/
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (inTutorial) {
+			if (stepOfTutorial == 0) { //View cone step:
+				if (Input.anyKeyDown) { //Move to the next step:
+					focusor.transform.position 
+					= new Vector3 (falconHelper.transform.position.x + 1.75f, falconHelper.transform.position.y - 11f, focusor.transform.position.z);
+					tutorialText.transform.position 
+					= new Vector3 (tutorialText.transform.position.x + 15, tutorialText.transform.position.y, tutorialText.transform.position.z);
+					tutorialText.text 
+					= "Try pressing and holding this button to pan around. " +
+					"You'll notice the map in the bottom right moving. If you push " +
+					"the remote too far in or out, the image's focus will decrease. ";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 1) { //Panning step. The user will have to pan for 1.5 seconds to get to the next step:
+				if (Input.GetMouseButton (1)) { //<-- if the right mouse button is held down (change for falcon):
+					timePannedInTutorial += Time.deltaTime;
+				}
+				if (timePannedInTutorial >= 3.5f) {
+					tutorialText.transform.position 
+					= new Vector3 (tutorialText.transform.position.x + 12, tutorialText.transform.position.y - 2, tutorialText.transform.position.z);
+					focusor.transform.position 
+					= new Vector3 (focusor.transform.position.x - 12, focusor.transform.position.y + 2, focusor.transform.position.z);
+					tutorialText.text
+					= "Each of these 2 buttons can be used to select a tag. " +
+					"Press one of these buttons on your controller to continue.";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 2) { //Step where user is being shown Select buttons:
+				timeSpentPerSelectButton += Time.deltaTime;
+				if (timeSpentPerSelectButton >= 1.0f) { //1 second per select button, then switches:
+					float factor;
+					if (switchRight) {
+						factor = 24f;
+						switchRight = false;
+					} else {
+						factor = -24f;
+						switchRight = true;
+					}
+
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x + factor, focusor.transform.position.y, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x - factor, tutorialText.transform.position.y, tutorialText.transform.position.z);
+					timeSpentPerSelectButton = 0.0f;
+				}
+				if (Input.GetMouseButtonDown (0)) { //<-- if left mouse button was clicked (change for falcon to either Select buttons):
+					focusor.transform.localScale 
+					= new Vector3 (focusor.transform.localScale.x * 1.5f, focusor.transform.localScale.y / 2.0f, focusor.transform.localScale.z); //To be tag width/height
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x / 1.5f, tutorialText.transform.localScale.y * 2.0f, tutorialText.transform.localScale.z); //Unsqueeze
+					float factor;
+					if (switchRight) { //The position of the focusor is changing every second.. this prevents the 50% chance of it being placed way to the right of the Tag
+						factor = 24f;
+					} else {
+						factor = 0f;
+					}
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x + 25.5f + factor, focusor.transform.position.y - 8.5f, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x - 15f - (factor * 1.5f), tutorialText.transform.position.y, tutorialText.transform.position.z);
+					tutorialText.text
+					= "Try selecting the highlighted tag by clicking once (not holding) " +
+					"either of the two Select buttons. Don't worry about where you place it for now.";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 3) { //Step where user selects highlighted tag:
+				if (state.getSelected () != null) { //User's holding a tag:
+					focusor.transform.localScale 
+					= new Vector3 (focusor.transform.localScale.x / 1.5f, focusor.transform.localScale.y * 2.0f, focusor.transform.localScale.z); //Normalize it
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x * 1.5f, tutorialText.transform.localScale.y / 2.0f, tutorialText.transform.localScale.z); //Unsqueeze
+
+					//Now make focus window roughly area of Image:
+					focusor.transform.localScale
+					= new Vector3 (focusor.transform.localScale.x * 9f, focusor.transform.localScale.y * 9f, focusor.transform.localScale.z);
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x / 9f, tutorialText.transform.localScale.y / 9f, tutorialText.transform.localScale.z);
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x - 67f, focusor.transform.position.y - 100f, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x - 110f, tutorialText.transform.position.y + 30f, tutorialText.transform.position.z);
+					tutorialText.text
+					= "Place the tag anywhere you want on the image by again pressing either " +
+					"of the two Select buttons once (not holding).";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 4) { //Step where user places the tag anywhere in the image:
+				if (state.getSelected () == null) { //User dropped tag on image, switch to next tutorial step:
+					focusor.transform.localScale
+					= new Vector3 (focusor.transform.localScale.x / 4.5f, focusor.transform.localScale.y / 4.5f, focusor.transform.localScale.z); //Make for trashcan size
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x * 4.5f, tutorialText.transform.localScale.y * 4.5f, tutorialText.transform.localScale.z);
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x + 117f, focusor.transform.position.y + 60f, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x - 65f, tutorialText.transform.position.y, tutorialText.transform.position.z);
+					tutorialText.text
+					= "That's pretty much it - a few more things: if you see a tag that's " +
+					"useless, you can put it in the garbage can here in the same way as you " +
+					"put it on the image, and it'll be replaced in the Word Bank... (Press any key to continue)";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 5) { //Showing garbage can:
+				if (Input.anyKeyDown) { //Change this for the falcon
+					//Go to the next step:
+					focusor.transform.localScale
+					= new Vector3 (focusor.transform.localScale.x * 1.5f, focusor.transform.localScale.y / 3.5f, focusor.transform.localScale.z); //Make for "tags left" label
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x / 1.5f, tutorialText.transform.localScale.y * 3.5f, tutorialText.transform.localScale.z);
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x - 37f, focusor.transform.position.y + 48f, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x + 15f, tutorialText.transform.position.y, tutorialText.transform.position.z);
+					tutorialText.text
+					= "Each image requires 5 tags. Once you place 5 tags (not including trashed " +
+					"tags), the image changes to a new one. (Press any key to continue)";
+
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 6) {
+				if (Input.anyKeyDown) { //Change for falcon
+					focusor.transform.localScale
+					= new Vector3 (focusor.transform.localScale.x / 1.5f, focusor.transform.localScale.y * 1.25f, focusor.transform.localScale.z);
+					tutorialText.transform.localScale
+					= new Vector3 (tutorialText.transform.localScale.x * 1.5f, tutorialText.transform.localScale.y / 1.25f, tutorialText.transform.localScale.z);
+
+					focusor.transform.position
+					= new Vector3 (focusor.transform.position.x, focusor.transform.position.y - 80f, focusor.transform.position.z);
+					tutorialText.transform.position
+					= new Vector3 (tutorialText.transform.position.x - 5f, tutorialText.transform.position.y - 5f, tutorialText.transform.position.z);
+
+					tutorialText.text
+					= "And finally, you can quit any time you want. Press any key to begin!";
+
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 7) {
+				if (Input.anyKeyDown) { //Change for falcon
+					//END OF TUTORIAL:
+					inTutorial = false;
+					dataCollector.SetActive (true);
+					focusor.SetActive (false);
+
+					sequenceIndex = 0; //Reset tags
+					for (int i = 0; i < tags.Length; i++) {
+						tags[i].setText(wordBank [ SEQUENCE[imageIndex, sequenceIndex] ]);
+						sequenceIndex++;
+					}
+					tagSphere.GetComponent<Renderer> ().material = imageMaterials [imageIndex]; //Start first image
+					tagsRemainingText.text = "5 Tag Left"; //Factory Tag prefab from tutorial needs to be deleted:
+					foreach(Transform t in GameObject.Find("TagSphere").transform)
+					{
+						Destroy(t.gameObject);
+					}
+					numTagsRemaining = 5;
+					stepOfTutorial++; //End
+				}
+			}
+		}
 	}
 	//This method can be called from the EventListener script using the GameObject that was clicked on as input:
 	public static void replaceTag(GameObject obj, bool clickedImage) {

@@ -91,7 +91,9 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             GameObject currentTag = state.getSelected();
             if (currentTag != null)
             {
-				DataCollector.AddTag(currentTag.transform.parent.name);
+				if (!MakeWordBank.inTutorial) {
+					DataCollector.AddTag (currentTag.transform.parent.name);
+				}
                 MakeWordBank.replaceTag(currentTag, false);
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
             }
@@ -152,8 +154,9 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					text.transform.localScale = new Vector3 (-0.075f, 0.25f, 0.25f);
 					text.transform.localPosition = Vector3.zero;
 					text.transform.localEulerAngles = Vector3.zero;
-
-					DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
+					if (!MakeWordBank.inTutorial) {
+						DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
+					}
 
 					MakeWordBank.replaceTag (currentTag, true);
 					currentTag.GetComponentInChildren<Text>().color = Color.black;

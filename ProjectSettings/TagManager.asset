@@ -11,6 +11,10 @@ TagManager:
   - TagSphere
   - QuitButton
   - Canvas
+  - Focusor
+  - DataCollector
+  - TutorialText
+  - FalconHelper
   layers:
   - Default
   - TransparentFX
