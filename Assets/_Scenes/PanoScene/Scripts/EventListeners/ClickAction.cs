@@ -81,7 +81,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			//cursorTag.name = currentTag.GetComponent<Text> ().name;
 			//cursorTag.transform.localScale = new Vector3 (8.8f, 3.188f, 0.001f);
         }
-        else if (objectClicked.tag == "QuitButton") // Quit button clicked by falcon
+		else if (objectClicked.tag == "QuitButton" && !MakeWordBank.inTutorial) // Quit button clicked by falcon
         {
             QuitGameScript.TaskOnClick();
         }

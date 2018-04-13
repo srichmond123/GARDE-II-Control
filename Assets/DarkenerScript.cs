@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class DarkenerScript : MonoBehaviour {
 	// Use this for initialization
-	static float scrollPos = 0f;
+	public static float scrollPos = 0f;
 	static Image image;
 	static GameObject camera;
 

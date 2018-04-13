@@ -15,6 +15,7 @@ TagManager:
   - DataCollector
   - TutorialText
   - FalconHelper
+  - WelcomeText
   layers:
   - Default
   - TransparentFX
