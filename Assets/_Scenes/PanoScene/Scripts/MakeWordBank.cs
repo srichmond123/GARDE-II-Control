@@ -142,6 +142,7 @@ public class MakeWordBank : MonoBehaviour {
 	public static GameObject falconHelper; //So when the focus window goes to the button it doesn't depend on absolute coordinates
 	public static Text tutorialText;
 	public static GameObject helpTextContainer;
+    public static GameObject helpTextPanel;
 	public static Text welcomeText;
 	public static GameObject welcomeScreen;
 	public static GameObject dataCollector;
@@ -150,6 +151,9 @@ public class MakeWordBank : MonoBehaviour {
 	public static float timePannedInTutorial = 0f;
 	public static float timeSpentBeforeFocus = 0f; //I don't want the step of demonstrating focus to possibly end instantly, so I'll make it show up for a mandatory minimum of time ~2 sec
 	public static bool switchRight = true; //For the Select button part of the tutorial
+
+    int buttons;
+    int buttonsPrev;
 
 	//Array of the container class I made below for a "Tag" object - since it's static, 
 	//you can have an eventlistener on another class and call methods like MakeWordBank.replaceTag(GameObject obj)
@@ -239,8 +243,9 @@ public class MakeWordBank : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (inTutorial) {
+            buttons = state.getButtons();
 			if (stepOfTutorial == 0) { //Welcome screen step:
-				if (Input.anyKeyDown) { //Move to the next step (change for falcon):
+				if (buttons > 0) { //Move to the next step (change for falcon):
 					welcomeScreen.SetActive (false);
 					tutorialArrow.SetActive (true);
 					helpTextContainer.SetActive (true);
@@ -250,12 +255,12 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 1) { //Panning step. The user will have to pan for 3 seconds to get to the next step:
-				if (Input.GetMouseButton (1)) { //<-- if the right mouse button is held down (change for falcon):
+				if ((buttons & 1) > 0) { //<-- if the right mouse button is held down (change for falcon):
 					timePannedInTutorial += Time.deltaTime;
 				}
 				if (timePannedInTutorial >= 3.0f) {
 					tutorialArrow.transform.localPosition = new Vector3 (132f, -120f, 0f); //To view cone
-					helpTextContainer.transform.localPosition = new Vector3 (-50f, -120f, 0f);
+					helpTextContainer.transform.localPosition = new Vector3 (-50f, -90f, 0f);
 					tutorialText.fontSize = 12;
 					tutorialText.text = "If you push your controller too far inward or outward you'll " +
 					"lose focus. Try doing this to go to the next step.";
@@ -267,7 +272,7 @@ public class MakeWordBank : MonoBehaviour {
 					if (Mathf.Abs (DarkenerScript.scrollPos) * 3 > 0.33) { //User pushed in or out the controller far enough:
 						//Go to next step:
 						secondTutorialArrow.SetActive (true); //Used to show both select buttons
-						tutorialArrow.transform.localPosition = new Vector3 (-83f, 134f, 0f);
+						tutorialArrow.transform.localPosition = new Vector3 (-83f, 100f, 0f);
 						helpTextContainer.transform.localPosition = new Vector3 (-257f, 167f, 0f);
 						tutorialText.text = "Either of these two buttons on your controller can be used " +
 						"to select tags. Press either to continue.";
@@ -275,7 +280,7 @@ public class MakeWordBank : MonoBehaviour {
 					}
 				}
 			} else if (stepOfTutorial == 3) { //Step where user is shown Select buttons:
-				if (Input.GetMouseButtonDown (0)) { //If I click the left mouse button down (change for falcon):
+				if ((buttons & 2) > 0) { //If I click the left mouse button down (change for falcon):
 					secondTutorialArrow.SetActive (false);
 					tutorialArrow.SetActive (false);
 					focusor.SetActive (true);
@@ -306,7 +311,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 6) { //Showing tags left label:
-				if (Input.anyKeyDown) { //Change this for the falcon
+				if (buttons > 0 && buttonsPrev == 0) { //Change this for the falcon
 					//Go to the next step:
 					tutorialText.fontSize = 11;
 					helpTextContainer.transform.localPosition = new Vector3 (50, 56, 0);
@@ -318,7 +323,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 7) {
-				if (Input.anyKeyDown) { //Change for falcon
+				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
 					tutorialText.fontSize = 12;
 					tutorialText.text
 					= "And finally, you can quit any time you want by pressing here with either Select button. " +
@@ -329,7 +334,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 8) { //Last element of tutorial, reshowing welcome screen basically
-				if (Input.anyKeyDown) {
+				if (buttons > 0 && buttonsPrev == 0) {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
 					welcomeScreen.SetActive (true);
@@ -338,7 +343,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 9) {
-				if (Input.anyKeyDown) { //Change for falcon
+				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
 					//END OF TUTORIAL:
 					inTutorial = false;
 					dataCollector.SetActive (true);
@@ -359,6 +364,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++; //End
 				}
 			}
+            buttonsPrev = buttons;
 		}
 	}
 	//This method can be called from the EventListener script using the GameObject that was clicked on as input:
