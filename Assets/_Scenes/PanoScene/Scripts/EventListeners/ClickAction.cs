@@ -56,6 +56,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 
         if (objectClicked.tag == "Tag") // A tag was pressed
         {
+            if (MakeWordBank.inTutorial && MakeWordBank.stepOfTutorial != 4)
+            {
+                return;
+            }
             Debug.Log(objectClicked.name); // Name of the object
             GameObject currentTag = state.getSelected();
             if (currentTag != null && currentTag.GetComponent<Text>() != null)
