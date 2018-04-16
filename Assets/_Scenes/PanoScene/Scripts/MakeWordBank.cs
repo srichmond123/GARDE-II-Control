@@ -300,14 +300,15 @@ public class MakeWordBank : MonoBehaviour {
 					helpTextContainer.transform.localPosition = new Vector3 (50, 97, 0);
 					tutorialArrow.SetActive (true);
 					tutorialArrow.transform.localPosition = new Vector3 (90, 120, 0);
-					tutorialText.fontSize = 11;
+					//tutorialText.fontSize = 11;
 					tutorialText.text = "After 5 tags have been placed, the image will change to " +
-					"a new one. There are 50 total images. (Press any button to continue)";
+					"a new one. (Press any button to continue)";
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 6) { //Showing tags left label:
 				if (Input.anyKeyDown) { //Change this for the falcon
 					//Go to the next step:
+					tutorialText.fontSize = 11;
 					helpTextContainer.transform.localPosition = new Vector3 (50, 56, 0);
 					tutorialText.text = "Useless tags can be placed in the garbage in the same way tags " +
 					"are placed on the image. New tags will appear in the wordbank. (Press any button to continue)";
