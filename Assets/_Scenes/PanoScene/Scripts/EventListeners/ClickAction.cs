@@ -14,6 +14,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 
 	private GameObject cursorTag; //Tag that follows cursor
     private GameObject cursorSphere; // Falcon cursor
+	private List<GameObject> trashedTags;
 
     public Material tagMaterial;
 
@@ -29,6 +30,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 		canvas = GameObject.Find ("Canvas");
 
         cursorSphere = GameObject.Find("CursorSphere");
+		trashedTags = new List<GameObject> ();
     }
 
 	//This method is only needed when the user has clicked a tag, and the instantiated GameObject tag needs to follow the cursor:
@@ -76,7 +78,7 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			//Make tag that follows cursor:
 			cursorTag = Instantiate (state.getSelected().transform.parent.gameObject, canvas.transform);
 			cursorTag.transform.LookAt (Vector3.zero);
-			cursorTag.transform.Rotate (new Vector3 (0f, 0f, -3f));
+			//cursorTag.transform.Rotate (new Vector3 (0f, 0f, -3f));
 			cursorTag.layer = 5; //UI Layer
             if (cursorSphere != null)
             {
@@ -95,11 +97,41 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             GameObject currentTag = state.getSelected();
             if (currentTag != null)
             {
-				if (!MakeWordBank.inTutorial) {
-					DataCollector.AddTag (currentTag.transform.parent.name);
+				if (!MakeWordBank.inTutorial && MakeWordBank.sequenceIndex < MakeWordBank.wordBank.Count) {
+					if (!MakeWordBank.inPracticeLevel) {
+						DataCollector.AddTag (currentTag.transform.parent.name);
+					}
+					GameObject newTrashedTag = Instantiate (state.getSelected ().transform.parent.gameObject, canvas.transform);
+					newTrashedTag.transform.localScale 
+					= new Vector3 (newTrashedTag.transform.localScale.x / 2.0f, newTrashedTag.transform.localScale.y / 2.5f, newTrashedTag.transform.localScale.z);
+					newTrashedTag.transform.GetChild (0).GetComponent<Text> ().color = Color.black;
+					newTrashedTag.transform.tag = "TrashedTag";
+					newTrashedTag.transform.GetChild (0).tag = "TrashedTag";
+					int verticalBump = 0;
+					if (trashedTags.Count >= 14 && trashedTags.Count < 28) {
+						verticalBump = 168; //To prevent overlap
+					} else if (trashedTags.Count >= 28 && trashedTags.Count < 42) {
+						verticalBump = 606;
+					} else if (trashedTags.Count >= 42) {
+						verticalBump = 774;
+					}
+					
+					int horizontalBump = 0;
+					if (trashedTags.Count >= 14 && trashedTags.Count < 28) {
+						horizontalBump = 50;
+					} else if (trashedTags.Count >= 28 && trashedTags.Count < 42) {
+						horizontalBump = 0;
+					} else if (trashedTags.Count >= 42) {
+						horizontalBump = 50;
+					}
+					newTrashedTag.transform.position = canvas.transform.TransformPoint(new Vector2(320 + horizontalBump, -55 - 12*trashedTags.Count + verticalBump)) + Vector3.back * -0.25f;
+					newTrashedTag.transform.LookAt(newTrashedTag.transform.position + Vector3.back * newTrashedTag.transform.position.z * -1);
+					trashedTags.Add (newTrashedTag);
+					trashedTags[trashedTags.Count - 1].layer = 5; //UI
 				}
                 MakeWordBank.replaceTag(currentTag, false);
-                currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
+				currentTag.GetComponentInChildren<Text>().color = Color.clear;
+                currentTag.GetComponent<Text>().color = Color.clear; // Reset the color of the previously selected tag
             }
 			if (cursorTag != null) {
 				Destroy(cursorTag);
@@ -158,13 +190,21 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					text.transform.localScale = new Vector3 (-0.075f, 0.25f, 0.25f);
 					text.transform.localPosition = Vector3.zero;
 					text.transform.localEulerAngles = Vector3.zero;
-					if (!MakeWordBank.inTutorial) {
+					if (!MakeWordBank.inTutorial && !MakeWordBank.inPracticeLevel) {
 						DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
 					}
 
+					int diff = MakeWordBank.sequenceIndex; //This is just a convoluted way to find out if the image turned over so the trashed tag prefabs can be deleted
 					MakeWordBank.replaceTag (currentTag, true);
-					currentTag.GetComponentInChildren<Text>().color = Color.black;
+					currentTag.GetComponentInChildren<Text>().color = Color.clear;
 					state.setSelected (null);
+					diff -= MakeWordBank.sequenceIndex;
+					if (diff > 0) { //Means image turned over:
+						for (int i = 0; i < trashedTags.Count; i++) {
+							Destroy (trashedTags [i]);
+						}
+						trashedTags.Clear();
+					}
 
 
                     // ---- Below is old code used to create the tag whereever the click happened. It isn't being used now but may be useful later

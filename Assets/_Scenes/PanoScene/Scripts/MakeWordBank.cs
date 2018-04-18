@@ -17,7 +17,7 @@ public class MakeWordBank : MonoBehaviour {
     // The Text object will be a child of the panel representing that tag, so it is fine to have one array representing the GameObject and the Tag for each tag
 	//public Text[] textObjects;
 
-	//Numbers 0-47 (elements of .csv file) in a random order, different predetermined random indexes for all 50 images:
+	//Numbers 0-47 (elements of .csv file) in a random order, different predetermined random indexes for all 51 images (first is practice img):
 	public static int[,] SEQUENCE = new int[,] { {
 			44, 43, 2, 23, 30, 46, 3, 27, 45, 17, 41, 1, 42, 29, 12, 34, 16, 6, 13, 37, 47, 25, 21, 22, 19, 33, 32, 11, 26, 7, 24, 0, 10, 39, 8, 36, 20, 4, 31, 14, 40, 35, 18, 38, 15, 28, 9, 5
 		}, {
@@ -118,10 +118,17 @@ public class MakeWordBank : MonoBehaviour {
 			16, 38, 15, 26, 30, 46, 6, 8, 5, 39, 45, 37, 1, 33, 28, 42, 13, 17, 20, 19, 29, 9, 12, 18, 36, 25, 34, 23, 27, 24, 0, 41, 31, 3, 10, 11, 44, 22, 7, 47, 21, 2, 40, 32, 4, 43, 14, 35
 		}, {
 			21, 33, 41, 20, 28, 26, 10, 18, 19, 40, 0, 35, 45, 25, 42, 16, 23, 17, 29, 5, 12, 32, 1, 13, 30, 27, 8, 43, 34, 44, 46, 15, 4, 37, 22, 3, 39, 9, 14, 31, 6, 36, 24, 11, 2, 47, 38, 7
+		}, {
+			18, 25, 11, 20, 16, 6, 36, 8, 5, 42, 27, 28, 21, 44, 34, 40, 0, 3, 38, 22, 14, 37, 15, 26, 2, 31, 29, 24, 33, 32, 4, 10, 12, 17, 45, 47, 13, 46, 7, 1, 30, 39, 23, 41, 9, 19, 35, 43
 		}
 	};
 
-	static int sequenceIndex = 0; //Indicates which element of predetermined sequence we're on, should reset to 0 every turnover
+	static string[] tutorialWords = {
+		"Woman","Police Car", "Screen", "Building", "Sky", "Cone", "Newspaper", "Advertisement",
+		"Man", "Chair", "Table", "Rail", "Vent", "Billboard", "Truck"
+	};
+	static int tutorialWordsIndex = 0;
+	public static int sequenceIndex = 0; //Indicates which element of predetermined sequence we're on, should reset to 0 every turnover
 	static int imageIndex = 0; //Index for which 360 Material to use as well as which predetermined random int sequence to use
 
 	static int numTagsRemaining = 5;
@@ -144,13 +151,17 @@ public class MakeWordBank : MonoBehaviour {
 	public static GameObject helpTextContainer;
     public static GameObject helpTextPanel;
 	public static Text welcomeText;
+	public static GameObject practiceLevelText;
 	public static GameObject welcomeScreen;
 	public static GameObject dataCollector;
+
 	public static bool inTutorial = true;
+	public static bool inPracticeLevel = false;
 	public static int stepOfTutorial = 0;
 	public static float timePannedInTutorial = 0f;
 	public static float timeSpentBeforeFocus = 0f; //I don't want the step of demonstrating focus to possibly end instantly, so I'll make it show up for a mandatory minimum of time ~2 sec
 	public static bool switchRight = true; //For the Select button part of the tutorial
+	public static bool inScreenBeforeExperiment = false;
 
     int buttons;
     int buttonsPrev;
@@ -182,6 +193,9 @@ public class MakeWordBank : MonoBehaviour {
 		helpTextContainer.SetActive (false);
 		welcomeText = GameObject.FindGameObjectWithTag ("WelcomeText").GetComponent<Text> () as Text;
 		welcomeScreen = GameObject.Find ("WelcomeScreenPanel");
+		practiceLevelText = GameObject.Find ("PracticeLevelText");
+		practiceLevelText.SetActive (false);
+
 		for (int i = 0; i < imageMaterials.Length; i++) {
 			imageMaterials [i] = imageMaterialsToDragIn [i];
 		}
@@ -225,9 +239,10 @@ public class MakeWordBank : MonoBehaviour {
 		dataCollector.SetActive(false);
 
 		tagSphere.GetComponent<Renderer> ().material = tutorialImageMaterial;
+		//Word bank isn't applicable for the tutorial level:
 		for (int i = 0; i < tags.Length; i++) {
-			tags[i].setText(wordBank [ SEQUENCE[imageIndex, sequenceIndex] ]);
-			sequenceIndex++;
+			tags[i].setText(tutorialWords[tutorialWordsIndex]);
+			tutorialWordsIndex++;
 		}
 		////////
 		/// 
@@ -316,7 +331,7 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialText.fontSize = 11;
 					helpTextContainer.transform.localPosition = new Vector3 (50, 56, 0);
 					tutorialText.text = "Useless tags can be placed in the garbage in the same way tags " +
-					"are placed on the image. New tags will appear in the wordbank. (Press any button to continue)";
+					"are placed on the image. New tags will appear in your wordbank. (Press any button to continue)";
 					tutorialArrow.transform.localEulerAngles = new Vector3 (0f, 0f, -45f);
 					tutorialArrow.transform.localPosition = new Vector3 (240, 16, 0);
 
@@ -338,15 +353,15 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
 					welcomeScreen.SetActive (true);
-					welcomeText.text = "That's all you need to know. Press any button to begin, " +
-						"and thank you for participating!";
+					welcomeText.text = "Now that you know the controls, let's try a practice level - " +
+						"it'll be just like a real level but data won't be collected. (Press any button to continue)";
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 9) {
 				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
 					//END OF TUTORIAL:
 					inTutorial = false;
-					dataCollector.SetActive (true);
+					//dataCollector.SetActive (true); Don't collect data for practice level
 					welcomeScreen.SetActive (false);
 
 					sequenceIndex = 0; //Reset tags
@@ -362,9 +377,28 @@ public class MakeWordBank : MonoBehaviour {
 					}
 					numTagsRemaining = 5;
 					stepOfTutorial++; //End
+					inPracticeLevel = true;
+					practiceLevelText.SetActive (true);
 				}
 			}
             buttonsPrev = buttons;
+		}
+		if (inScreenBeforeExperiment) {
+			buttons = state.getButtons ();
+			if (buttons > 0 && buttonsPrev == 0) {
+				dataCollector.SetActive (true);
+				welcomeScreen.SetActive (false);
+				inScreenBeforeExperiment = false;
+			}
+			buttonsPrev = buttons;
+		}
+		for (int i = 0; i < tags.Length; i++) {
+			if (tags [i].isChangingColor) {
+				tags [i].text.color = Color.Lerp (tags [i].text.color, Color.black, 0.04f);
+			}
+			if (tags[i].isChangingColor && tags [i].text.color == Color.black) {
+				tags [i].isChangingColor = false;
+			}
 		}
 	}
 	//This method can be called from the EventListener script using the GameObject that was clicked on as input:
@@ -372,14 +406,26 @@ public class MakeWordBank : MonoBehaviour {
 		//Find tag with this object:
 		for (int i = 0; i < tags.Length; i++) {
 			if(obj.name == tags[i].text.name) {
-				if (sequenceIndex < wordBank.Count) {
-					tags[i].setText(wordBank [ SEQUENCE[imageIndex, sequenceIndex] ]);
-					sequenceIndex++;
-				} else {
-					if (clickedImage) {
-						tags [i].setText ("");
+				if (inTutorial) {
+					if (tutorialWordsIndex < tutorialWords.Length) {
+						tags [i].isChangingColor = true;
+
+						tags [i].setText (tutorialWords [tutorialWordsIndex]);
 					} else {
-						//Do nothing so you can't throw away tags when there's nothing to replace them
+						tags [i].setText ("");
+					}
+				} else {
+					if (sequenceIndex < wordBank.Count) {
+						tags [i].isChangingColor = true;
+
+						tags [i].setText (wordBank [SEQUENCE [imageIndex, sequenceIndex]]);
+						sequenceIndex++;
+					} else {
+						if (clickedImage) {
+							tags [i].setText ("");
+						} else {
+							//Do nothing so you can't throw away tags when there's nothing to replace them
+						}
 					}
 				}
 			}
@@ -398,7 +444,9 @@ public class MakeWordBank : MonoBehaviour {
 						Application.Quit ();
 					}
 					if (!inTutorial) {
-						DataCollector.Flush ();
+						if (!inPracticeLevel) { //Are we not in the practice level:
+							DataCollector.Flush ();
+						}
 						foreach (Transform t in GameObject.Find("TagSphere").transform) {
 							Destroy (t.gameObject, 0.08f);
 						}
@@ -410,6 +458,13 @@ public class MakeWordBank : MonoBehaviour {
 						for (int tagsIndex = 0; tagsIndex < tags.Length; tagsIndex++) {
 							tags [tagsIndex].setText (wordBank [SEQUENCE [imageIndex, sequenceIndex]]);
 							sequenceIndex++;
+						}
+						if (inPracticeLevel) {
+							practiceLevelText.SetActive (false);
+							welcomeText.text = "That's all you need to know - Press any button to start the experiment";
+							welcomeScreen.SetActive (true);
+							inScreenBeforeExperiment = true;
+							inPracticeLevel = false;
 						}
 					}
 				}
@@ -424,6 +479,7 @@ public class MakeWordBank : MonoBehaviour {
 public class Tag {
 	public GameObject tag;
 	public Text text;
+	public bool isChangingColor = false; //This will allow a tag coming in from the word bank to gradually fade to black text from clear
 	public Tag(GameObject tag, int index) {
 		this.tag = tag;
 		this.text = tag.GetComponentInChildren<Text>();

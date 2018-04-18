@@ -16,6 +16,7 @@ TagManager:
   - TutorialText
   - FalconHelper
   - WelcomeText
+  - TrashedTag
   layers:
   - Default
   - TransparentFX
