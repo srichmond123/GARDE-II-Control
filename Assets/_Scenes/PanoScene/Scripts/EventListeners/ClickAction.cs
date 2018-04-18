@@ -174,9 +174,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 					newObject.transform.localScale = new Vector3 (0.25f, 0.1f, 0.00001f);
 					newObject.name = currentTag.transform.parent.name; // CHANGE THIS LATER
 					newObject.transform.parent = sphere.transform;
+                    newObject.GetComponent<Renderer>().material = new Material(Shader.Find("Diffuse"));
 
-					// Create the object which will hold the TextMesh
-					GameObject textContainer = new GameObject ();
+                    // Create the object which will hold the TextMesh
+                    GameObject textContainer = new GameObject ();
 					textContainer.transform.parent = newObject.transform;
                 
 					// Create the text mesh to be rendered over the plane

@@ -7,10 +7,10 @@ using UnityEngine.EventSystems;
 
 public class MakeWordBank : MonoBehaviour {
 
-	//I'm putting the CSV files in the directory Assets/Tags, 
-	//Using the final wordbank Roni gave me:
-
-	static string image1Path = "Assets/Tags/wordbank.csv";
+    //I'm putting the CSV files in the directory Assets/Tags, 
+    //Using the final wordbank Roni gave me:
+    
+    public TextAsset tagsText;
 	private List<GameObject> tagGameObjects;
 	StateManager state; //For tutorial only
 
@@ -175,7 +175,8 @@ public class MakeWordBank : MonoBehaviour {
 	public static Tag[] tags;
 
 	void Start () {
-		tagSphere = GameObject.FindGameObjectWithTag ("TagSphere");
+
+        tagSphere = GameObject.FindGameObjectWithTag ("TagSphere");
 		imageMaterials = new Material[imageMaterialsToDragIn.Length];
 		tutorialImageMaterial = tutorialImageMaterialDragFromEditor;
 		focusor = GameObject.FindGameObjectWithTag ("Focusor"); //Just used for step where user picks a tag
@@ -215,7 +216,8 @@ public class MakeWordBank : MonoBehaviour {
 			tags [i] = new Tag (tagGameObjects [i], i);
 		}
 		//Read CSV File:
-		using (StreamReader sr = new StreamReader(image1Path))
+
+		using (StringReader sr = new StringReader(tagsText.text))
 		{
 			string line;
 
@@ -287,7 +289,7 @@ public class MakeWordBank : MonoBehaviour {
 					if (Mathf.Abs (DarkenerScript.scrollPos) * 3 > 0.33) { //User pushed in or out the controller far enough:
 						//Go to next step:
 						secondTutorialArrow.SetActive (true); //Used to show both select buttons
-						tutorialArrow.transform.localPosition = new Vector3 (-83f, 100f, 0f);
+						tutorialArrow.transform.localPosition = new Vector3 (-83f, 134f, 0f);
 						helpTextContainer.transform.localPosition = new Vector3 (-257f, 167f, 0f);
 						tutorialText.text = "Either of these two buttons on your controller can be used " +
 						"to select tags. Press either to continue.";
