@@ -345,12 +345,12 @@ public class MakeWordBank : MonoBehaviour {
 					helpTextContainer.transform.localPosition = new Vector3 (30, 97, 0);
 					tutorialText.GetComponent<RectTransform> ().sizeDelta 
 					= new Vector2 (380, 65);
-					tutorialText.transform.localPosition 
-					= new Vector3 (10, -25f, 0);
 					tutorialText.text = "Place the tag on the image " +
 					"by pressing the button once again";
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
 					= new Vector2 (380, 20f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (12, -25f, 0);
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 5) { //Step where user places the tag anywhere in the image:
@@ -410,6 +410,8 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive (false);
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
 					= new Vector2 (330, 40f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (7, -15f, 0);
 					tutorialText.text = "Place it in the bin, and a new word will appear in the wordbank";
 					stepOfTutorial++;
 				}
@@ -437,8 +439,8 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
 					welcomeScreen.SetActive (true);
-					welcomeText.text = "Now let's do a practice level - " +
-						"it will be just like a real level but data will not be collected. (Press any button to begin the practice level)";
+					welcomeText.text = "Now let's do a practice level.\n" +
+						"It will be just like a real level but data will not be collected.\n(Press any button to begin the practice level)";
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 11) {
@@ -545,7 +547,7 @@ public class MakeWordBank : MonoBehaviour {
 						}
 						if (inPracticeLevel) {
 							practiceLevelText.SetActive (false);
-							welcomeText.text = "You have completed the practice level. Press any button to " +
+							welcomeText.text = "You have completed the practice level.\nPress any button to " +
 								"begin data collection."; 
 							welcomeScreen.SetActive (true);
 							inScreenBeforeExperiment = true;
