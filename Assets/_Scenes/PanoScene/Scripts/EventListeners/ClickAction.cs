@@ -44,6 +44,12 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			cursorTag.transform.position = canvas.transform.TransformPoint(pos) + Vector3.back * -0.25f;
             cursorTag.transform.LookAt(cursorTag.transform.position + Vector3.back * cursorTag.transform.position.z);
 		}
+		if (MakeWordBank.stepOfTutorial == 11 && trashedTags.Count != 0) {
+			for (int i = 0; i < trashedTags.Count; i++) {
+				Destroy (trashedTags [i]);
+			}
+			trashedTags.Clear();
+		}
 	}
 
     public void OnPointerClick(PointerEventData eventData)
@@ -58,10 +64,13 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 
         if (objectClicked.tag == "Tag") // A tag was pressed
         {
-            if (MakeWordBank.inTutorial && MakeWordBank.stepOfTutorial != 4)
+			if (MakeWordBank.inTutorial && MakeWordBank.stepOfTutorial != 4 && MakeWordBank.stepOfTutorial != 8)
             {
                 return;
             }
+			if (MakeWordBank.stepOfTutorial == 8 && MakeWordBank.timeSpentOnStep8 <= 0.25f) {
+				return; //prevents glitch
+			}
             Debug.Log(objectClicked.name); // Name of the object
             GameObject currentTag = state.getSelected();
             if (currentTag != null && currentTag.GetComponent<Text>() != null)
@@ -97,8 +106,8 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             GameObject currentTag = state.getSelected();
             if (currentTag != null)
             {
-				if (!MakeWordBank.inTutorial && MakeWordBank.sequenceIndex < MakeWordBank.wordBank.Count) {
-					if (!MakeWordBank.inPracticeLevel) {
+				if (MakeWordBank.sequenceIndex < MakeWordBank.wordBank.Count) {
+					if (!MakeWordBank.inPracticeLevel && !MakeWordBank.inTutorial) {
 						DataCollector.AddTag (currentTag.transform.parent.name);
 					}
 					GameObject newTrashedTag = Instantiate (state.getSelected ().transform.parent.gameObject, canvas.transform);

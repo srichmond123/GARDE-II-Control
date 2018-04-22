@@ -124,7 +124,7 @@ public class MakeWordBank : MonoBehaviour {
 	};
 
 	static string[] tutorialWords = {
-		"Woman","Police Car", "Screen", "Building", "Sky", "Cone", "Newspaper", "Advertisement",
+		"Woman","Police Car", "Screen", "Building", "Sky", "Cone", "Newspaper", "Mountain",
 		"Man", "Chair", "Table", "Rail", "Vent", "Billboard", "Truck"
 	};
 	static int tutorialWordsIndex = 0;
@@ -159,6 +159,7 @@ public class MakeWordBank : MonoBehaviour {
 	public static bool inPracticeLevel = false;
 	public static int stepOfTutorial = 0;
 	public static float timePannedInTutorial = 0f;
+	public static float timeSpentOnStep8 = 0f;
 	public static float timeSpentBeforeFocus = 0f; //I don't want the step of demonstrating focus to possibly end instantly, so I'll make it show up for a mandatory minimum of time ~2 sec
 	public static bool switchRight = true; //For the Select button part of the tutorial
 	public static bool inScreenBeforeExperiment = false;
@@ -195,6 +196,7 @@ public class MakeWordBank : MonoBehaviour {
 		welcomeText = GameObject.FindGameObjectWithTag ("WelcomeText").GetComponent<Text> () as Text;
 		welcomeScreen = GameObject.Find ("WelcomeScreenPanel");
 		practiceLevelText = GameObject.Find ("PracticeLevelText");
+		helpTextPanel = tutorialText.transform.parent.gameObject;
 		practiceLevelText.SetActive (false);
 
 		for (int i = 0; i < imageMaterials.Length; i++) {
@@ -259,15 +261,26 @@ public class MakeWordBank : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		//To add:
+		//Survey,
+		//Beginning ppt slides
+
 		if (inTutorial) {
-            buttons = state.getButtons();
+			buttons = state.getButtons ();
 			if (stepOfTutorial == 0) { //Welcome screen step:
 				if (buttons > 0) { //Move to the next step (change for falcon):
 					welcomeScreen.SetActive (false);
 					tutorialArrow.SetActive (true);
 					helpTextContainer.SetActive (true);
-					tutorialText.text = "Try pressing and holding this button on your controller " +
-					"to pan around the image for a few seconds";
+					//Change the size of the box
+					tutorialText.text = "Press this button to pan around the image";
+					//Width from 150->218
+					//228,24
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (270, 24);
+					tutorialText.GetComponent<RectTransform> ().sizeDelta 
+					= new Vector2 (260, 65);
+					tutorialText.transform.localPosition = new Vector2 (tutorialText.transform.localPosition.x, -25);
 					helpTextContainer.transform.localPosition = new Vector3 (-215f, 150f, 0f);
 					stepOfTutorial++;
 				}
@@ -277,10 +290,17 @@ public class MakeWordBank : MonoBehaviour {
 				}
 				if (timePannedInTutorial >= 3.0f) {
 					tutorialArrow.transform.localPosition = new Vector3 (132f, -120f, 0f); //To view cone
-					helpTextContainer.transform.localPosition = new Vector3 (-50f, -90f, 0f);
+					helpTextContainer.transform.localPosition = new Vector3 (-200f, -90f, 0f);
 					tutorialText.fontSize = 12;
-					tutorialText.text = "If you push your controller too far inward or outward you'll " +
-					"lose focus. Try doing this to go to the next step.";
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (430, 40f);
+					tutorialText.text = "If you push or pull your controller too much, the image will fade out.\n" +
+					"Try it to see.";
+					tutorialText.GetComponent<RectTransform> ().sizeDelta 
+					= new Vector2 (450, 65);
+					tutorialText.transform.localPosition 
+					= new Vector3 (tutorialText.transform.localPosition.x + 10, -15f, 0);
+
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 2) { //Step for losing focus:
@@ -290,9 +310,13 @@ public class MakeWordBank : MonoBehaviour {
 						//Go to next step:
 						secondTutorialArrow.SetActive (true); //Used to show both select buttons
 						tutorialArrow.transform.localPosition = new Vector3 (-83f, 134f, 0f);
-						helpTextContainer.transform.localPosition = new Vector3 (-257f, 167f, 0f);
-						tutorialText.text = "Either of these two buttons on your controller can be used " +
-						"to select tags. Press either to continue.";
+						helpTextContainer.transform.localPosition = new Vector3 (-230f, 130f, 0f);
+						tutorialText.GetComponent<RectTransform> ().sizeDelta 
+						= new Vector2 (480, 65);
+						helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+						= new Vector2 (480, 40);
+						tutorialText.text = "Either one of these two buttons on your controller can be used " +
+						"to select tags.\nPress either to continue.";
 						stepOfTutorial++;
 					}
 				}
@@ -301,9 +325,16 @@ public class MakeWordBank : MonoBehaviour {
 					secondTutorialArrow.SetActive (false);
 					tutorialArrow.SetActive (false);
 					focusor.SetActive (true);
-					helpTextContainer.transform.localPosition = new Vector3 (-57, 97, 0);
-					tutorialText.text = "Press either Select button once (don't hold) on your controller " +
-					"on any of these tags.";
+					helpTextContainer.transform.localPosition = new Vector3 (-150, 97, 0);
+					tutorialText.text = "Press either button once (do not hold) " +
+					"to select a tag";
+					tutorialText.GetComponent<RectTransform> ().sizeDelta 
+					= new Vector2 (330, 65);
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (330, 20f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (0, -25f, 0);
+
 					stepOfTutorial++;
 				}
 				
@@ -312,8 +343,14 @@ public class MakeWordBank : MonoBehaviour {
 					focusor.transform.localPosition = new Vector3 (-100.7f, -450f, -271.39f);
 					focusor.transform.localScale = new Vector3 (30.7f, 8.2f, 3f);
 					helpTextContainer.transform.localPosition = new Vector3 (30, 97, 0);
-					tutorialText.text = "Now place it in anywhere (don't worry about accuracy now) " +
-					"by pressing either Select button once again.";
+					tutorialText.GetComponent<RectTransform> ().sizeDelta 
+					= new Vector2 (380, 65);
+					tutorialText.transform.localPosition 
+					= new Vector3 (10, -25f, 0);
+					tutorialText.text = "Place the tag on the image " +
+					"by pressing the button once again";
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (380, 20f);
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 5) { //Step where user places the tag anywhere in the image:
@@ -323,43 +360,88 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive (true);
 					tutorialArrow.transform.localPosition = new Vector3 (90, 120, 0);
 					//tutorialText.fontSize = 11;
-					tutorialText.text = "After 5 tags have been placed, the image will change to " +
-					"a new one. (Press any button to continue)";
+					tutorialText.text = "After 5 tags are used, the image will be replaced.\n" +
+					"(Press any button to continue)";
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (310, 40f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (40, -15, 0);
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 6) { //Showing tags left label:
 				if (buttons > 0 && buttonsPrev == 0) { //Change this for the falcon
 					//Go to the next step:
 					tutorialText.fontSize = 11;
-					helpTextContainer.transform.localPosition = new Vector3 (50, 56, 0);
-					tutorialText.text = "Useless tags can be placed in the garbage in the same way tags " +
-					"are placed on the image. New tags will appear in your wordbank. (Press any button to continue)";
+					helpTextContainer.transform.localPosition = new Vector3 (-150, 56, 0);
+					tutorialText.text = "If none of the tags appear in the image, you can trash a tag " +
+					"and it will be replaced with a new one.\n(Press any button to continue)";
 					tutorialArrow.transform.localEulerAngles = new Vector3 (0f, 0f, -45f);
 					tutorialArrow.transform.localPosition = new Vector3 (240, 16, 0);
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (550, 40f);
+					tutorialText.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (550, 65f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (7, -15, 0);
 
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 7) {
-				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
+				if (buttons > 0 && buttonsPrev == 0) { //Changes to step where they pick up a tag from the wordbank to be put in the trash
+					focusor.SetActive (true);
+					focusor.transform.localPosition = new Vector3 (208.12f, -113f, -271.39f);
+					focusor.transform.localScale = new Vector3 (10.8f, 3, 3);
+					tutorialArrow.transform.localPosition = new Vector3 (160, 16, 0);
+					helpTextContainer.transform.localPosition = new Vector3 (-150, 97, 0);
+					tutorialText.text = "Select a useless tag from the wordbank";
+					tutorialText.GetComponent<RectTransform> ().sizeDelta 
+					= new Vector2 (330, 65);
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (330, 20f);
+					tutorialText.transform.localPosition 
+					= new Vector3 (0, -25f, 0);
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 8) {
+				timeSpentOnStep8 += Time.deltaTime; //To prevent this step from instantly being gone over (this var is being checked in ClickAction.cs)
+				if (state.getSelected () != null) { //User's holding a tag
+					focusor.transform.localPosition = new Vector3 (347.42f, -111.9f, -271.39f);
+					focusor.transform.localScale = new Vector3 (6.1f, 2.22f, 3f);
+					tutorialArrow.SetActive (false);
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (330, 40f);
+					tutorialText.text = "Place it in the bin, and a new word will appear in the wordbank";
+					stepOfTutorial++;
+				}
+			} else if (stepOfTutorial == 9) {
+				if (state.getSelected() == null) { //user dropped tag into bin
 					tutorialText.fontSize = 12;
+					tutorialText.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (400, 40f);
+					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+					= new Vector2 (370, 40f);
 					tutorialText.text
-					= "And finally, you can quit any time you want by pressing here with either Select button. " +
+					= "You can quit any time you want by pressing the Quit button.\n" +
 					"(Press any button to continue)";
+					focusor.SetActive (false);
+					tutorialArrow.SetActive (true);
 					tutorialArrow.transform.localEulerAngles = new Vector3 (0f, 0f, -90f);
 					helpTextContainer.transform.localPosition = new Vector3 (-29, -20, 0);
 					tutorialArrow.transform.localPosition = new Vector3 (128, -110, 0);
+					tutorialText.transform.localPosition 
+					= new Vector3 (21, -4, 0);
 					stepOfTutorial++;
 				}
-			} else if (stepOfTutorial == 8) { //Last element of tutorial, reshowing welcome screen basically
+			} else if (stepOfTutorial == 10) { //Last element of tutorial, reshowing welcome screen basically
 				if (buttons > 0 && buttonsPrev == 0) {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
 					welcomeScreen.SetActive (true);
-					welcomeText.text = "Now that you know the controls, let's try a practice level - " +
-						"it'll be just like a real level but data won't be collected. (Press any button to continue)";
+					welcomeText.text = "Now let's do a practice level - " +
+						"it will be just like a real level but data will not be collected. (Press any button to begin the practice level)";
 					stepOfTutorial++;
 				}
-			} else if (stepOfTutorial == 9) {
+			} else if (stepOfTutorial == 11) {
 				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
 					//END OF TUTORIAL:
 					inTutorial = false;
@@ -396,7 +478,7 @@ public class MakeWordBank : MonoBehaviour {
 		}
 		for (int i = 0; i < tags.Length; i++) {
 			if (tags [i].isChangingColor) {
-				tags [i].text.color = Color.Lerp (tags [i].text.color, Color.black, 0.04f);
+				tags [i].text.color = Color.Lerp (tags [i].text.color, Color.black, 0.015f);
 			}
 			if (tags[i].isChangingColor && tags [i].text.color == Color.black) {
 				tags [i].isChangingColor = false;
@@ -463,7 +545,8 @@ public class MakeWordBank : MonoBehaviour {
 						}
 						if (inPracticeLevel) {
 							practiceLevelText.SetActive (false);
-							welcomeText.text = "That's all you need to know - Press any button to start the experiment";
+							welcomeText.text = "You have completed the practice level. Press any button to " +
+								"begin data collection."; 
 							welcomeScreen.SetActive (true);
 							inScreenBeforeExperiment = true;
 							inPracticeLevel = false;
