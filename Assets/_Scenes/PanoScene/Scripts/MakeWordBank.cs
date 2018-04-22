@@ -397,9 +397,9 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialText.GetComponent<RectTransform> ().sizeDelta 
 					= new Vector2 (330, 65);
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
-					= new Vector2 (330, 20f);
+					= new Vector2 (250, 20f);
 					tutorialText.transform.localPosition 
-					= new Vector3 (0, -25f, 0);
+					= new Vector3 (50, -25f, 0);
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 8) {
