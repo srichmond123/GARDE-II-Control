@@ -155,7 +155,7 @@ public class MakeWordBank : MonoBehaviour {
 	public static GameObject welcomeScreen;
 	public static GameObject dataCollector;
 
-	public static bool inTutorial = true;
+	public static bool inTutorial = false;
 	public static bool inPracticeLevel = false;
 	public static int stepOfTutorial = 0;
 	public static float timePannedInTutorial = 0f;
@@ -163,6 +163,7 @@ public class MakeWordBank : MonoBehaviour {
 	public static float timeSpentBeforeFocus = 0f; //I don't want the step of demonstrating focus to possibly end instantly, so I'll make it show up for a mandatory minimum of time ~2 sec
 	public static bool switchRight = true; //For the Select button part of the tutorial
 	public static bool inScreenBeforeExperiment = false;
+	public static float timeSpentAfterSurvey = 0.5f;
 
     int buttons;
     int buttonsPrev;
@@ -268,7 +269,8 @@ public class MakeWordBank : MonoBehaviour {
 		if (inTutorial) {
 			buttons = state.getButtons ();
 			if (stepOfTutorial == 0) { //Welcome screen step:
-				if (buttons > 0) { //Move to the next step (change for falcon):
+				timeSpentAfterSurvey += Time.deltaTime;
+				if (buttons > 0 && timeSpentAfterSurvey >= 1f) { //Move to the next step (change for falcon):
 					welcomeScreen.SetActive (false);
 					tutorialArrow.SetActive (true);
 					helpTextContainer.SetActive (true);
@@ -527,7 +529,7 @@ public class MakeWordBank : MonoBehaviour {
 					tagsRemainingText.text = numTagsRemaining + " Tag Left";
 				} else {
 					if (imageIndex == imageMaterials.Length - 1) { //On last image, then quit:
-						Application.Quit ();
+						QuitGameScript.quitGame();
 					}
 					if (!inTutorial) {
 						if (!inPracticeLevel) { //Are we not in the practice level:

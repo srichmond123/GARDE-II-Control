@@ -30,6 +30,14 @@ public class DataCollector : MonoBehaviour
     static bool falcon; // Is the controller on?
 	static bool writtenPanDataColumnNames = false;
 
+	//SURVEY ANSWERS: (Data of survey will be logged when DataCollector is activated)
+	public static string ageAnswer;
+	public static string genderAnswer;
+	public static string englishSpeakingAnswer;
+	public static string[] sliderQuestions;
+	public static int[] sliderAnswers;
+
+
     // Use this for initialization
     void Start()
     {
@@ -46,6 +54,46 @@ public class DataCollector : MonoBehaviour
 
 		userPath = dataPath + "User-" + userID + '/';
 		Directory.CreateDirectory(userPath);
+
+		string path = userPath + "survey.csv";
+
+		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
+		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
+		streamWriter.Write ("Questions:,Answers:\n");
+		string line = "Age:," + ageAnswer + "\n";
+		streamWriter.Write(line);
+		line = "Gender:," + genderAnswer + "\n";
+		streamWriter.Write(line);
+		line = "English first language?:," + englishSpeakingAnswer + "\n";
+		streamWriter.Write(line);
+		//line = "(1 = strongly disagree) - (2 = disagree) - (3 = somewhat disagree), 4 = neutral," +
+		//	" 5 = somewhat agree, 6 = agree, 7 = strongly agree";
+		//Strongly disagree -> agree questions answers:
+
+		for (int i = 0; i < sliderQuestions.Length; i++) {
+			string agreement;
+			int val = sliderAnswers[i];
+			if (val == 0)
+				agreement = "Didn't answer";
+			else if (val == 1)
+				agreement = "Strongly disagree";
+			else if (val == 2)
+				agreement = "Disagree";
+			else if (val == 3)
+				agreement = "Somewhat disagree";
+			else if (val == 4)
+				agreement = "Neutral";
+			else if (val == 5)
+				agreement = "Somewhat agree";
+			else if (val == 6)
+				agreement = "Agree";
+			else
+				agreement = "Strongly agree";
+			line = sliderQuestions [i] + "," + agreement + "\n";
+			streamWriter.Write(line);
+		}
+
+		streamWriter.Close();
     }
 
     // Update is called once per frame
@@ -192,6 +240,32 @@ public class DataCollector : MonoBehaviour
 			streamWriter.Write (line);
 		}
 		streamWriter.Close(); // Close the file after writing
+	}
+	public static void writeFinalQuestion(int val) {
+		string agreement;
+		if (val == 0)
+			agreement = "Didn't answer";
+		else if (val == 1)
+			agreement = "Strongly disagree";
+		else if (val == 2)
+			agreement = "Disagree";
+		else if (val == 3)
+			agreement = "Somewhat disagree";
+		else if (val == 4)
+			agreement = "Neutral";
+		else if (val == 5)
+			agreement = "Somewhat agree";
+		else if (val == 6)
+			agreement = "Agree";
+		else
+			agreement = "Strongly agree";
+
+		string path = userPath + "survey.csv";
+
+		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
+		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
+		streamWriter.Write ("Did you enjoy the activity?," + agreement);
+		streamWriter.Close ();
 	}
 }
 
