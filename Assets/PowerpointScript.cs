@@ -10,7 +10,7 @@ public class PowerpointScript : MonoBehaviour {
 	static float delay;
 	static Color colorBegin;
 	static Color colorEnd;
-	static float delayFactor = 1.0f;
+	static float transitionTime = 1.0f;
 
 	void Awake()
 	{
@@ -29,20 +29,21 @@ public class PowerpointScript : MonoBehaviour {
 	}
 	
 	void Update () {
-		delay += Time.deltaTime;
-		slides[slideIndex].color = Color.Lerp(colorBegin, colorEnd, delay * delayFactor);
+        delay += Time.deltaTime;
+		slides[slideIndex].color = Color.Lerp(colorBegin, colorEnd, delay / transitionTime);
 		if (slides [slideIndex].color == Color.white) { //Change slides
 			if (slideIndex < slides.Length-1) { //Still in powerpoint:
 				//If we're still in a slide or going to the next slide:
-				if (slides [slideIndex + 1].name.Substring (0, 7).Equals (slides [slideIndex].name.Substring (0, 7))) {
+				if (slides [slideIndex + 1].name.Substring (0, 7).Equals (slides [slideIndex].name.Substring (0, 7)) && delay > 2f) {
 					slideIndex++;
 					delay = 0f;
-					delayFactor = 0.82f;
+                    transitionTime = 1f;
 				} else { //Wait for keystroke
 					if (Input.anyKeyDown) {
 						slideIndex++;
 						delay = 0f;
-					}
+                        transitionTime = 0.75f;
+                    }
 				}
 			} else { //Powerpoint over:
 				if (Input.anyKeyDown) {
