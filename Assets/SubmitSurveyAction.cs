@@ -63,5 +63,16 @@ public class SubmitSurveyAction : MonoBehaviour
 
 		gameObject.transform.parent.parent.gameObject.SetActive (false);
 		MakeWordBank.inTutorial = true;
+        if (GameObject.Find("Falcon"))
+        {
+            foreach(Camera obj in Resources.FindObjectsOfTypeAll<Camera>())
+            {
+                if (obj.name == "CursorCamera")
+                {
+                    obj.transform.parent.gameObject.SetActive(true);
+                }
+            }
+        }
+        GameObject.Find("Canvas").GetComponent<StateManager>().enabled = true;
 	}
 }
