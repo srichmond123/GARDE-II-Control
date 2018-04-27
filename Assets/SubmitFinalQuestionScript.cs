@@ -7,6 +7,7 @@ public class SubmitFinalQuestionScript : MonoBehaviour {
 
 	// Use this for initialization
 	public Slider slide;
+    public Slider slide2;
 	public static bool startListening = false;
 	bool notAwake = true;
 
@@ -23,7 +24,7 @@ public class SubmitFinalQuestionScript : MonoBehaviour {
 	}
 
 	void TaskOnClick() {
-		DataCollector.writeFinalQuestion ((int) slide.value);
+		DataCollector.writeFinalQuestion ((int) slide.value, (int) slide2.value);
 		Debug.Log ("Clicked Submit button");
 		Application.Quit ();
 	}

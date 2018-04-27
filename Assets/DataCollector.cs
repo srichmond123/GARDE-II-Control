@@ -241,31 +241,41 @@ public class DataCollector : MonoBehaviour
 		}
 		streamWriter.Close(); // Close the file after writing
 	}
-	public static void writeFinalQuestion(int val) {
-		string agreement;
-		if (val == 0)
-			agreement = "Didn't answer";
-		else if (val == 1)
-			agreement = "Strongly disagree";
-		else if (val == 2)
-			agreement = "Disagree";
-		else if (val == 3)
-			agreement = "Somewhat disagree";
-		else if (val == 4)
-			agreement = "Neutral";
-		else if (val == 5)
-			agreement = "Somewhat agree";
-		else if (val == 6)
-			agreement = "Agree";
-		else
-			agreement = "Strongly agree";
+
+    static string getResponse(int val)
+    {
+        string agreement;
+        if (val == 0)
+            agreement = "Didn't answer";
+        else if (val == 1)
+            agreement = "Strongly disagree";
+        else if (val == 2)
+            agreement = "Disagree";
+        else if (val == 3)
+            agreement = "Somewhat disagree";
+        else if (val == 4)
+            agreement = "Neutral";
+        else if (val == 5)
+            agreement = "Somewhat agree";
+        else if (val == 6)
+            agreement = "Agree";
+        else
+            agreement = "Strongly agree";
+        return agreement;
+    }
+
+	public static void writeFinalQuestion(int val, int val2) {
+
 
 		string path = userPath + "survey.csv";
+        string a1 = getResponse(val);
+        string a2 = getResponse(val2);
 
 		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
 		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
-		streamWriter.Write ("Did you enjoy the activity?," + agreement);
-		streamWriter.Close ();
+        streamWriter.Write("Did you enjoy the activity?," + a1 + "\n");
+        streamWriter.Write("Did you think the activity was fun?," + a2);
+        streamWriter.Close ();
 	}
 }
 
