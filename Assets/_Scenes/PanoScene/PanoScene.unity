@@ -9562,7 +9562,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 2800000, guid: b1156b081d4e247dda0cab95a2370aff, type: 3}
+  m_Texture: {fileID: 2800000, guid: 34e1fb6db3f614809bd526c7b45ac1ff, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -15659,7 +15659,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 2800000, guid: 847cfc7c5e70f44249ae5d765310c5d6, type: 3}
+  m_Texture: {fileID: 2800000, guid: a6e243f6a3cf541f9b82cf40aa850578, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -18029,7 +18029,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 2800000, guid: fb11b2f33efd546239bfe796a174f847, type: 3}
+  m_Texture: {fileID: 2800000, guid: 29963f882fd2548398268e3e383ac078, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -21426,7 +21426,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Texture: {fileID: 2800000, guid: d6593ee24a5e547c0bba8f498c931de8, type: 3}
+  m_Texture: {fileID: 2800000, guid: 0a4fc6fe473f24f6fbb504babef73b2e, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
