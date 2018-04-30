@@ -120,7 +120,7 @@ public class DataCollector : MonoBehaviour
 		string line = elapsedTime.ToString () + "," +
 			cam.transform.localEulerAngles.x.ToString () + "," + cam.transform.localEulerAngles.y.ToString ();
 		if (falcon) {
-			line += "," + tempPos.x.ToString () + "," + tempPos.y.ToString () + tempPos.z.ToString() + "\n";
+			line += "," + tempPos.x.ToString () + "," + tempPos.y.ToString () + "," + tempPos.z.ToString() + "\n";
 		} else {
 			line += "\n";
 		}
