@@ -114,7 +114,7 @@ public class DataCollector : MonoBehaviour
 		new FileStream(path, FileMode.Append, FileAccess.Write, FileShare.Write).Close();
 		StreamWriter streamWriter = new StreamWriter(path, true, Encoding.ASCII);
 		if (!writtenPanDataColumnNames) { //Only write this once:
-			streamWriter.Write ("time (s), rotation.x, rotation.y, falcon.x, falcon.y, falcon.z\n");
+			streamWriter.Write ("time (s), rotation_x, rotation_y, falcon_x, falcon_y, falcon_z\n");
 			writtenPanDataColumnNames = true;
 		}
 		string line = elapsedTime.ToString () + "," +
