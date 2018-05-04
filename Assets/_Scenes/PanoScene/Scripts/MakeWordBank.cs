@@ -163,6 +163,8 @@ public class MakeWordBank : MonoBehaviour {
 	public static float timeSpentBeforeFocus = 0f; //I don't want the step of demonstrating focus to possibly end instantly, so I'll make it show up for a mandatory minimum of time ~2 sec
 	public static bool switchRight = true; //For the Select button part of the tutorial
 	public static bool inScreenBeforeExperiment = false;
+	public static bool waitingForOtherPlayer = false;
+	public static bool otherPlayerHasFinished = false;
 	public static float timeSpentAfterSurvey = 0.5f;
 
     int buttons;
@@ -474,11 +476,22 @@ public class MakeWordBank : MonoBehaviour {
 		if (inScreenBeforeExperiment) {
 			buttons = state.getButtons ();
 			if (buttons > 0 && buttonsPrev == 0) {
-				dataCollector.SetActive (true);
-				welcomeScreen.SetActive (false);
+				//dataCollector.SetActive (true);
+				//welcomeScreen.SetActive (false);
+				welcomeText.text = "We are now waiting for the other player to finish the tutorial";
+				LoadingIconScript.active = true;
+				welcomeText.transform.localPosition = new Vector3 (31.2f, -0.8f, 0f);
 				inScreenBeforeExperiment = false;
 			}
 			buttonsPrev = buttons;
+		}
+		if (waitingForOtherPlayer) {
+			if (otherPlayerHasFinished) {
+				dataCollector.SetActive (true);
+				welcomeScreen.SetActive (false);
+				waitingForOtherPlayer = false;
+				LoadingIconScript.active = false;
+			}
 		}
 		for (int i = 0; i < tags.Length; i++) {
 			if (tags [i].isChangingColor) {

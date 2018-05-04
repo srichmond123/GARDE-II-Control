@@ -18,6 +18,7 @@ public class DarkenerScript : MonoBehaviour {
 	void Start () {
 		image = gameObject.GetComponent<Image> ();
 		camera = GameObject.Find("Main Camera");
+
         if (falcon = GameObject.Find("Tip"))
         {
             falconPos = Vector3.zero;
