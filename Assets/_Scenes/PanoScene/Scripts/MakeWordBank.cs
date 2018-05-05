@@ -482,6 +482,7 @@ public class MakeWordBank : MonoBehaviour {
 				LoadingIconScript.active = true;
 				welcomeText.transform.localPosition = new Vector3 (31.2f, -0.8f, 0f);
 				inScreenBeforeExperiment = false;
+				waitingForOtherPlayer = true;
 			}
 			buttonsPrev = buttons;
 		}

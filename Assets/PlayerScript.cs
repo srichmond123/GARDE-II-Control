@@ -8,16 +8,10 @@ public class PlayerScript : NetworkBehaviour {
 	// Use this for initialization
 
 	private bool finishedTutorial = false;
-
-	public class RegisterHostMessage : MessageBase
-	{
-		public string gameName;
-		public string comment;
-		public bool passwordProtected;
-	}
+	static int frame = 0;
 
 	void Start () {
-		if (!hasAuthority) {
+		if (!localPlayerAuthority) {
 			return;
 		}
 
@@ -30,28 +24,39 @@ public class PlayerScript : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!hasAuthority) {
+		if (!localPlayerAuthority) {
 			return;
 		}
+		frame++;
+			
+		if (frame > 5) { //This is done to not slow network traffic by calling commands every frame
+			if (isServer) {
+				if (MakeWordBank.waitingForOtherPlayer) {
+					RpcAskClientIfFinishedTutorial ();
 
-		if (isServer) {
-			if (MakeWordBank.waitingForOtherPlayer) {
-				RpcAskClientIfFinishedTutorial ();
-				if (finishedTutorial) {
-					MakeWordBank.otherPlayerHasFinished = true;
+					//Debug.Log (MakeWordBank.waitingForOtherPlayer); //Is server still waiting???
+				}
+			} else {
+				if (MakeWordBank.otherPlayerHasFinished) {
+					CmdTellServerClientIsFinished ();
 				}
 			}
-		} else {
-
+			frame = 0;
 		}
 	}
 
 	[ClientRpc]
 	void RpcAskClientIfFinishedTutorial() {
-		if (MakeWordBank.waitingForOtherPlayer) { //If client is already waiting
-			MakeWordBank.otherPlayerHasFinished = true;
-			finishedTutorial = true;
+		if (!isServer) { //Server is a client too
+			if (MakeWordBank.waitingForOtherPlayer) { //If client is already waiting
+				MakeWordBank.otherPlayerHasFinished = true;
+			}
 		}
+	}
+
+	[Command]
+	void CmdTellServerClientIsFinished() {
+		MakeWordBank.otherPlayerHasFinished = true;
 	}
 
 
