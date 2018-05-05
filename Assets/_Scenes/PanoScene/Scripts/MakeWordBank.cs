@@ -167,6 +167,8 @@ public class MakeWordBank : MonoBehaviour {
 	public static bool otherPlayerHasFinished = false;
 	public static float timeSpentAfterSurvey = 0.5f;
 
+	public static GameObject taggerPanel, trasherPanel;
+
     int buttons;
     int buttonsPrev;
 
@@ -201,6 +203,12 @@ public class MakeWordBank : MonoBehaviour {
 		practiceLevelText = GameObject.Find ("PracticeLevelText");
 		helpTextPanel = tutorialText.transform.parent.gameObject;
 		practiceLevelText.SetActive (false);
+
+		taggerPanel = GameObject.FindGameObjectWithTag("TaggerPanel");
+		trasherPanel = GameObject.FindGameObjectWithTag("TrasherPanel");
+
+		taggerPanel.transform.Translate (new Vector3 (0, 5000, 0)); //Moving it out of the way for tutorial
+		trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
 
 		for (int i = 0; i < imageMaterials.Length; i++) {
 			imageMaterials [i] = imageMaterialsToDragIn [i];

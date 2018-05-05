@@ -18,6 +18,8 @@ TagManager:
   - WelcomeText
   - TrashedTag
   - HelpTextPanel
+  - TaggerPanel
+  - TrasherPanel
   layers:
   - Default
   - TransparentFX
