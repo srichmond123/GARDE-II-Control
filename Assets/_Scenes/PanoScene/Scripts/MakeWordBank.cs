@@ -527,6 +527,7 @@ public class MakeWordBank : MonoBehaviour {
 				} else {
 					if (sequenceIndex < wordBank.Count) {
 						tags [i].isChangingColor = true;
+						tags [i].text.color = Color.clear;
 
 						tags [i].setText (wordBank [SEQUENCE [imageIndex, sequenceIndex]]);
 						sequenceIndex++;
@@ -557,9 +558,15 @@ public class MakeWordBank : MonoBehaviour {
 						if (!inPracticeLevel) { //Are we not in the practice level:
 							DataCollector.Flush ();
 						}
-						foreach (Transform t in GameObject.Find("TagSphere").transform) {
+						foreach (Transform t in tagSphere.transform) {
 							Destroy (t.gameObject, 0.08f);
 						}
+
+						for (int i = 0; i < ClickAction.trashedTags.Count; i++) {
+							Destroy (ClickAction.trashedTags [i]);
+						}
+						ClickAction.trashedTags.Clear();
+
 						numTagsRemaining = 5;
 						tagsRemainingText.text = numTagsRemaining + " Tags Left";
 						imageIndex++;

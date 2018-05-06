@@ -6,15 +6,15 @@ using UnityEngine.UI;
 
 public class ClickAction : MonoBehaviour, IPointerClickHandler
 {
-    StateManager state; // State of the application
+    public static StateManager state; // State of the application
 
-    private GameObject tagPrefab;
-    private GameObject sphere;
-	private GameObject canvas;
+	public static GameObject tagPrefab;
+	public static GameObject sphere;
+	public static GameObject canvas;
 
-	private GameObject cursorTag; //Tag that follows cursor
-    private GameObject cursorSphere; // Falcon cursor
-	private List<GameObject> trashedTags;
+	public static GameObject cursorTag; //Tag that follows cursor
+	public static GameObject cursorSphere; // Falcon cursor
+	public static List<GameObject> trashedTags;
 
     public Material tagMaterial;
 
@@ -71,8 +71,14 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			if (MakeWordBank.stepOfTutorial == 8 && MakeWordBank.timeSpentOnStep8 <= 0.25f) {
 				return; //prevents glitch
 			}
+
+			if (objectClicked.GetComponentInChildren<Text> ().color == Color.red) {
+				return; //Prevents trasher from clicking on a tag the tagger has selected in multiplayer
+			}
+
             Debug.Log(objectClicked.name); // Name of the object
             GameObject currentTag = state.getSelected();
+
             if (currentTag != null && currentTag.GetComponent<Text>() != null)
             {
                 currentTag.GetComponent<Text>().color = Color.black; // Reset the color of the previously selected tag
@@ -204,17 +210,17 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 						DataCollector.AddTag (currentTag.transform.parent.name, newObject.transform.position);
 					}
 
-					int diff = MakeWordBank.sequenceIndex; //This is just a convoluted way to find out if the image turned over so the trashed tag prefabs can be deleted
+					//int diff = MakeWordBank.sequenceIndex; //This is just a convoluted way to find out if the image turned over so the trashed tag prefabs can be deleted
 					MakeWordBank.replaceTag (currentTag, true);
 					currentTag.GetComponentInChildren<Text>().color = Color.clear;
 					state.setSelected (null);
-					diff -= MakeWordBank.sequenceIndex;
-					if (diff > 0) { //Means image turned over:
-						for (int i = 0; i < trashedTags.Count; i++) {
-							Destroy (trashedTags [i]);
-						}
-						trashedTags.Clear();
-					}
+					//diff -= MakeWordBank.sequenceIndex;
+					//if (diff > 0) { //Means image turned over:
+					//	for (int i = 0; i < trashedTags.Count; i++) {
+					//		Destroy (trashedTags [i]);
+					//	}
+					//	trashedTags.Clear();
+					//}
 
 
                     // ---- Below is old code used to create the tag whereever the click happened. It isn't being used now but may be useful later

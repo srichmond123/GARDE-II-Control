@@ -8,10 +8,10 @@ public class PlayerScript : NetworkBehaviour {
 	// Use this for initialization
 
 	private static bool finishedWaiting = false; //Once this is true, client and server should be playing together and constantly sending signals back and forth
+	//private static bool holdingATag = false;
+	private static string holdingTag = ""; //The tag's unique name in the wordbank, like Tag0, Tag9
+	private static string trashedTagText = "";
 	static int frame = 0;
-
-//	static GameObject taggerPanel;
-//	static GameObject trasherPanel;
 
 	static bool taggerPanelIsSet = false;
 	static bool trasherPanelIsSet = false;
@@ -20,12 +20,6 @@ public class PlayerScript : NetworkBehaviour {
 		if (!localPlayerAuthority) {
 			return;
 		}
-
-		/*
-		taggerPanel.transform.Translate (new Vector3 (0, 5000, 0)); //Moving it out of the way for tutorial
-		trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
-
-		*/
 
 		if (isServer) {  //Server is tagger, client is trasher
 			
@@ -52,6 +46,24 @@ public class PlayerScript : NetworkBehaviour {
 						MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, -5000, 0));
 						taggerPanelIsSet = true;
 					}
+					//Tell client (trasher) when the tagger is holding a tag:
+					if (ClickAction.state.getSelected ()) {
+						string name = ClickAction.state.getSelected ().GetComponent<Text> ().text;
+						holdingTag = ClickAction.state.getSelected ().GetComponent<Text> ().name;
+						RpcTellClientTagIsHeld (name);
+					} else {
+						if (!holdingTag.Equals("")) { //Means Server just dropped a tag, put it in client's game:
+							GameObject sphereTag = ClickAction.sphere.transform.GetChild(ClickAction.sphere.transform.childCount-1).gameObject;
+
+							Vector3 position = sphereTag.transform.localPosition;
+							Vector3 rotation = sphereTag.transform.localRotation.eulerAngles;
+							Vector3 scale = sphereTag.transform.localScale;
+							string name = sphereTag.transform.GetChild (0).GetComponent<TextMesh> ().text;
+
+							RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
+							holdingTag = "";
+						}
+					}
 				}
 			} else {
 				if (MakeWordBank.otherPlayerHasFinished) {
@@ -61,6 +73,21 @@ public class PlayerScript : NetworkBehaviour {
 					if (!trasherPanelIsSet) {
 						MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, -5000, 0));
 						trasherPanelIsSet = true;
+					}
+					//**********
+					//Potential glitch: trasher trashes a tag and before the signal can reach the tagger, the tagger picks it up.
+					//In this case, it'll be the one time the trasher overrules the tagger (makes sense this way and is probably gonna be easier to implement)
+
+					if (ClickAction.state.getSelected ()) {
+						holdingTag = ClickAction.state.getSelected ().GetComponent<Text> ().name;
+						trashedTagText = ClickAction.state.getSelected ().GetComponent<Text> ().text;
+					} else {
+						if (!holdingTag.Equals ("")) { //Means trasher has just dropped a tag into the trash:
+							CmdTellServerThrowAwayTag(trashedTagText, holdingTag);
+
+							trashedTagText = "";
+							holdingTag = "";
+						}
 					}
 				}
 			}
@@ -85,17 +112,125 @@ public class PlayerScript : NetworkBehaviour {
 	}
 
 
-	/*
-	[Command]
-	void CmdShiftPanels() {
-		taggerPanel.transform.Translate (new Vector3 (0, 5000, 0));
-		trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
+	[ClientRpc]
+	void RpcTellClientTagIsHeld(string name) {
+		if (!isServer) {
+			for (int i = 0; i < MakeWordBank.tags.Length; i++) {
+				if (MakeWordBank.tags [i].getText ().Equals (name)) {
+					MakeWordBank.tags [i].text.color = Color.red;
+				} else {
+					MakeWordBank.tags [i].text.color = Color.black;
+				}
+			}
+			if (ClickAction.state.getSelected ()) { //Check if the trasher is holding the same tag as the server: if not, do nothing:
+				string trasherTagHeld = ClickAction.state.getSelected ().GetComponent<Text> ().text;
+				if (trasherTagHeld.Equals (name)) {
+					holdingTag = "";
+					ClickAction.state.setSelected (null);
+					Destroy (ClickAction.cursorTag);
+					ClickAction.cursorTag = null;
+				}
+			}
+		}
 	}
 
 	[ClientRpc]
-	void RpcShiftPanels() {
-		taggerPanel.transform.Translate (new Vector3 (0, 5000, 0));
-		trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
+	void RpcAddTagToSphere (Vector3 position, string name, string tagUniqueName) {
+		if (!isServer) {
+			GameObject newTag = Instantiate (ClickAction.tagPrefab);
+			newTag.name = name;
+			newTag.GetComponent<Renderer>().material = new Material(Shader.Find("Diffuse"));
+
+			newTag.transform.localScale = new Vector3 (0.25f, 0.1f, 0.00001f);
+			newTag.transform.parent = ClickAction.sphere.transform;
+
+			newTag.transform.localPosition = position;
+			newTag.transform.LookAt (Vector3.zero); // Make it face the center of the sphere
+
+			GameObject textContainer = new GameObject ();
+			textContainer.transform.parent = newTag.transform;
+
+			TextMesh text = textContainer.AddComponent<TextMesh> ();
+			text.text = name;
+			text.fontSize = 20;
+			text.alignment = TextAlignment.Center;
+			text.anchor = TextAnchor.MiddleCenter;
+			text.name = name + "_Text";
+			text.transform.parent = textContainer.transform;
+			text.transform.localScale = new Vector3 (-0.075f, 0.25f, 0.25f);
+			text.transform.localPosition = Vector3.zero;
+			text.transform.localEulerAngles = Vector3.zero;
+
+
+			GameObject obj = new GameObject ();
+			obj.name = tagUniqueName; //Doing this because I'm trying not to really change any scripts outside of this one significantly
+
+			MakeWordBank.replaceTag (obj, true);
+		}
 	}
-	*/
+
+	[Command]
+	void CmdTellServerThrowAwayTag(string tagText, string uniqueTagName) {
+		//Server could have just then clicked on the tag that was thrown away:
+		for (int i = 0; i < MakeWordBank.tags.Length; i++) {
+			if (MakeWordBank.tags [i].getText ().Equals (tagText)) {
+				if (MakeWordBank.tags [i].text.color == Color.red) { //If they just then clicked on it, deselect it for tagger:
+					MakeWordBank.tags[i].text.color = Color.black;
+					if (ClickAction.cursorTag != null) {
+						Destroy(ClickAction.cursorTag);
+						ClickAction.cursorTag = null;
+						if (ClickAction.cursorSphere != null)
+						{
+							ClickAction.cursorSphere.GetComponent<MeshRenderer>().enabled = true;
+						}
+					}
+				}
+			}
+		}
+
+		GameObject objToInstantiate = null; //Object to put under trash can:
+		for (int i = 0; i < MakeWordBank.tags.Length; i++) {
+			if (MakeWordBank.tags [i].getText ().Equals (tagText)) {
+				objToInstantiate = MakeWordBank.tags [i].tag;
+			}
+		}
+
+
+		if (MakeWordBank.sequenceIndex < MakeWordBank.wordBank.Count) {
+			GameObject newTrashedTag = Instantiate (objToInstantiate, ClickAction.canvas.transform);
+			newTrashedTag.transform.localScale 
+			= new Vector3 (newTrashedTag.transform.localScale.x / 2.0f, newTrashedTag.transform.localScale.y / 2.5f, newTrashedTag.transform.localScale.z);
+			newTrashedTag.transform.GetChild (0).GetComponent<Text> ().color = Color.black;
+			newTrashedTag.transform.tag = "TrashedTag";
+			newTrashedTag.transform.GetChild (0).tag = "TrashedTag";
+			int verticalBump = 0;
+			if (ClickAction.trashedTags.Count >= 14 && ClickAction.trashedTags.Count < 28) {
+				verticalBump = 168; //To prevent overlap
+			} else if (ClickAction.trashedTags.Count >= 28 && ClickAction.trashedTags.Count < 42) {
+				verticalBump = 606;
+			} else if (ClickAction.trashedTags.Count >= 42) {
+				verticalBump = 774;
+			}
+
+			int horizontalBump = 0;
+			if (ClickAction.trashedTags.Count >= 14 && ClickAction.trashedTags.Count < 28) {
+				horizontalBump = 50;
+			} else if (ClickAction.trashedTags.Count >= 28 && ClickAction.trashedTags.Count < 42) {
+				horizontalBump = 0;
+			} else if (ClickAction.trashedTags.Count >= 42) {
+				horizontalBump = 50;
+			}
+			newTrashedTag.transform.position = ClickAction.canvas.transform.TransformPoint(new Vector2(320 + horizontalBump, -55 - 12*ClickAction.trashedTags.Count + verticalBump)) + Vector3.back * -0.25f;
+			newTrashedTag.transform.LookAt(newTrashedTag.transform.position + Vector3.back * newTrashedTag.transform.position.z * -1);
+			ClickAction.trashedTags.Add (newTrashedTag);
+			ClickAction.trashedTags[ClickAction.trashedTags.Count - 1].layer = 5; //UI
+		}
+
+		GameObject obj = new GameObject ();
+		obj.name = uniqueTagName;
+
+		MakeWordBank.replaceTag(obj, false);
+		//currentTag.GetComponentInChildren<Text>().color = Color.clear;
+		//currentTag.GetComponent<Text>().color = Color.clear;
+	}
 }
