@@ -219,7 +219,7 @@ public class DataCollector : MonoBehaviour
 
 		//Write to memory here instead of Flush() :
 
-		Transform tagTransform = GameObject.Find("TagSphere").transform;
+		Transform tagTransform = ClickAction.sphere.transform;
 		string userPath = dataPath + "User-" + userID + '/';
 		Directory.CreateDirectory(userPath);
 

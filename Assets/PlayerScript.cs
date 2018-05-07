@@ -11,6 +11,17 @@ public class PlayerScript : NetworkBehaviour {
 	//private static bool holdingATag = false;
 	private static string holdingTag = ""; //The tag's unique name in the wordbank, like Tag0, Tag9
 	private static string trashedTagText = "";
+	private static string nameLastTag = "";
+	private static bool terminated = false; //To prevent the final question from coming up over and over upon termination
+
+	///**************
+	/// jointTermination is the only variable needed to change to make it either both users end at once or one keeps playing
+	/// 
+	bool jointTermination = true;
+	///
+	///**************
+
+
 	static int frame = 0;
 
 	static bool taggerPanelIsSet = false;
@@ -48,20 +59,40 @@ public class PlayerScript : NetworkBehaviour {
 					}
 					//Tell client (trasher) when the tagger is holding a tag:
 					if (ClickAction.state.getSelected ()) {
-						string name = ClickAction.state.getSelected ().GetComponent<Text> ().text;
+						nameLastTag = ClickAction.state.getSelected ().GetComponent<Text> ().text;
 						holdingTag = ClickAction.state.getSelected ().GetComponent<Text> ().name;
-						RpcTellClientTagIsHeld (name);
+						RpcTellClientTagIsHeld (nameLastTag);
 					} else {
-						if (!holdingTag.Equals("")) { //Means Server just dropped a tag, put it in client's game:
-							GameObject sphereTag = ClickAction.sphere.transform.GetChild(ClickAction.sphere.transform.childCount-1).gameObject;
+						if (!holdingTag.Equals ("")) { //Means Server just dropped a tag, put it in client's game:
+							Transform tagTransform;
+							if (ClickAction.sphere.transform.childCount != 0) { //If the image hasn't already turned over
+								tagTransform = ClickAction.sphere.transform.GetChild (ClickAction.sphere.transform.childCount - 1);
+								Vector3 position = tagTransform.localPosition;
+								Vector3 rotation = tagTransform.localRotation.eulerAngles;
+								Vector3 scale = tagTransform.localScale;
+								string name = tagTransform.GetChild (0).GetComponent<TextMesh> ().text;
 
-							Vector3 position = sphereTag.transform.localPosition;
-							Vector3 rotation = sphereTag.transform.localRotation.eulerAngles;
-							Vector3 scale = sphereTag.transform.localScale;
-							string name = sphereTag.transform.GetChild (0).GetComponent<TextMesh> ().text;
+								RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
+							} else {
+								Vector3 position = MakeWordBank.positionLastTag;
+								Vector3 rotation = MakeWordBank.rotationLastTag;
+								Vector3 scale = MakeWordBank.scaleLastTag;
+								string name = nameLastTag;
 
-							RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
+								RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
+
+							}
 							holdingTag = "";
+						}
+					}
+					if (SubmitFinalQuestionScript.startListening) { //Means the server is quitting currently:
+						if (!terminated) {
+							if (jointTermination) {
+								RpcQuitGame ();
+							} else {
+								/////////
+							}
+							terminated = true;
 						}
 					}
 				}
@@ -87,6 +118,16 @@ public class PlayerScript : NetworkBehaviour {
 
 							trashedTagText = "";
 							holdingTag = "";
+						}
+					}
+					if (SubmitFinalQuestionScript.startListening) { //Client has quit
+						if (!terminated) {
+							if (jointTermination) {
+								CmdQuitGame ();
+							} else {
+								/////////
+							}
+							terminated = true;
 						}
 					}
 				}
@@ -178,6 +219,7 @@ public class PlayerScript : NetworkBehaviour {
 					MakeWordBank.tags[i].text.color = Color.black;
 					if (ClickAction.cursorTag != null) {
 						Destroy(ClickAction.cursorTag);
+						holdingTag = "";
 						ClickAction.cursorTag = null;
 						if (ClickAction.cursorSphere != null)
 						{
@@ -232,5 +274,23 @@ public class PlayerScript : NetworkBehaviour {
 		MakeWordBank.replaceTag(obj, false);
 		//currentTag.GetComponentInChildren<Text>().color = Color.clear;
 		//currentTag.GetComponent<Text>().color = Color.clear;
+	}
+
+	[ClientRpc]
+	void RpcQuitGame() {
+		if (!isServer) {
+			if (!terminated) { //So this isn't done twice
+				MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, -5000, 0));
+				QuitGameScript.TaskOnClick ();
+			}
+		}
+	}
+
+	[Command]
+	void CmdQuitGame() {
+		if (!terminated) {
+			MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, -5000, 0));
+			QuitGameScript.TaskOnClick ();
+		}
 	}
 }

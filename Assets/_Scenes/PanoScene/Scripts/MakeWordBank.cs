@@ -154,6 +154,7 @@ public class MakeWordBank : MonoBehaviour {
 	public static GameObject practiceLevelText;
 	public static GameObject welcomeScreen;
 	public static GameObject dataCollector;
+	public static Vector3 positionLastTag, rotationLastTag, scaleLastTag; //For use in PlayerScript when the last tag of an image is dropped:
 
 	public static bool inTutorial = false;
 	public static bool inPracticeLevel = false;
@@ -469,7 +470,7 @@ public class MakeWordBank : MonoBehaviour {
 					}
 					tagSphere.GetComponent<Renderer> ().material = imageMaterials [imageIndex]; //Start first image
 					tagsRemainingText.text = "5 Tags Left"; //Factory Tag prefab from tutorial needs to be deleted:
-					foreach(Transform t in GameObject.Find("TagSphere").transform)
+					foreach(Transform t in ClickAction.sphere.transform)
 					{
 						Destroy(t.gameObject);
 					}
@@ -558,6 +559,12 @@ public class MakeWordBank : MonoBehaviour {
 						if (!inPracticeLevel) { //Are we not in the practice level:
 							DataCollector.Flush ();
 						}
+						Transform lastTag = tagSphere.transform.GetChild (tagSphere.transform.childCount - 1);
+
+						positionLastTag = lastTag.localPosition;
+						rotationLastTag = lastTag.localRotation.eulerAngles;
+						scaleLastTag = lastTag.localScale;
+
 						foreach (Transform t in tagSphere.transform) {
 							Destroy (t.gameObject, 0.08f);
 						}
