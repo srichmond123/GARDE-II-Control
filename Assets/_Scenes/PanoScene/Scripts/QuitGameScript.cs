@@ -31,9 +31,9 @@ public class QuitGameScript : MonoBehaviour {
     {
         finalQuestionObj.SetActive(true);
         finalQuestionObj2.SetActive(true);
-        //foreach (GameObject g in GameObject.FindGameObjectsWithTag("TrashedTag")) {
-		//	g.transform.localPosition = new Vector3 (10001, 10001, 0);
-		//}
+        foreach (GameObject g in GameObject.FindGameObjectsWithTag("TrashedTag")) {
+			g.transform.localPosition = new Vector3 (10001, 10001, 0);
+		}
 		finalSubmitBtn.SetActive (true);
 		SubmitFinalQuestionScript.startListening = true;
 	}   

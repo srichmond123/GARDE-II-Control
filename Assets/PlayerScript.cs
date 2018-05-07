@@ -75,8 +75,6 @@ public class PlayerScript : NetworkBehaviour {
 								RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
 							} else {
 								Vector3 position = MakeWordBank.positionLastTag;
-								Vector3 rotation = MakeWordBank.rotationLastTag;
-								Vector3 scale = MakeWordBank.scaleLastTag;
 								string name = nameLastTag;
 
 								RpcAddTagToSphere (position, name, holdingTag); //holdingTag is for the MakeWordBank.replaceTag function (Tag0, Tag1 etc since they're unique)
@@ -88,6 +86,7 @@ public class PlayerScript : NetworkBehaviour {
 					if (SubmitFinalQuestionScript.startListening) { //Means the server is quitting currently:
 						if (!terminated) {
 							if (jointTermination) {
+								MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, 5000, 0));
 								RpcQuitGame ();
 							} else {
 								/////////
@@ -123,6 +122,7 @@ public class PlayerScript : NetworkBehaviour {
 					if (SubmitFinalQuestionScript.startListening) { //Client has quit
 						if (!terminated) {
 							if (jointTermination) {
+								MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
 								CmdQuitGame ();
 							} else {
 								/////////
@@ -279,8 +279,7 @@ public class PlayerScript : NetworkBehaviour {
 	[ClientRpc]
 	void RpcQuitGame() {
 		if (!isServer) {
-			if (!terminated) { //So this isn't done twice
-				MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, -5000, 0));
+			if (!SubmitFinalQuestionScript.startListening) { //So this isn't done twice
 				QuitGameScript.TaskOnClick ();
 			}
 		}
@@ -288,8 +287,7 @@ public class PlayerScript : NetworkBehaviour {
 
 	[Command]
 	void CmdQuitGame() {
-		if (!terminated) {
-			MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, -5000, 0));
+		if (!SubmitFinalQuestionScript.startListening) {
 			QuitGameScript.TaskOnClick ();
 		}
 	}
