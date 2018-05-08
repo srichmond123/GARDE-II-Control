@@ -19,7 +19,7 @@ public class PowerpointScript : MonoBehaviour {
 	}
 
 	void Start () {
-		slides = new RawImage[32];
+		slides = new RawImage[transform.childCount];
 
 		int index = 0;
 		foreach (Transform img in transform) {
