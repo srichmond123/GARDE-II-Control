@@ -17,7 +17,7 @@ public class PlayerScript : NetworkBehaviour {
 	///**************
 	/// jointTermination is the only variable needed to change to make it either both users end at once or one keeps playing
 	/// 
-	bool jointTermination = true;
+	bool jointTermination = false;
 	///
 	///**************
 
