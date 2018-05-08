@@ -168,6 +168,10 @@ public class MakeWordBank : MonoBehaviour {
 	public static bool otherPlayerHasFinished = false;
 	public static float timeSpentAfterSurvey = 0.5f;
 
+	public static bool skipTaggingTutorialStep = false;
+	public static bool skipTrashingTutorialStep = false;
+	public static bool continueAfterOtherQuit = false;
+
 	public static GameObject taggerPanel, trasherPanel;
 
     int buttons;
@@ -335,20 +339,24 @@ public class MakeWordBank : MonoBehaviour {
 				}
 			} else if (stepOfTutorial == 3) { //Step where user is shown Select buttons:
 				if ((buttons & 2) > 0) { //If I click the left mouse button down (change for falcon):
-					secondTutorialArrow.SetActive (false);
-					tutorialArrow.SetActive (false);
-					focusor.SetActive (true);
-					helpTextContainer.transform.localPosition = new Vector3 (-150, 97, 0);
-					tutorialText.text = "Press either button once (do not hold) " +
-					"to select a tag";
-					tutorialText.GetComponent<RectTransform> ().sizeDelta 
-					= new Vector2 (330, 65);
-					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
-					= new Vector2 (330, 20f);
-					tutorialText.transform.localPosition 
-					= new Vector3 (0, -25f, 0);
-
-					stepOfTutorial++;
+					if (!skipTaggingTutorialStep) {
+						secondTutorialArrow.SetActive (false);
+						tutorialArrow.SetActive (false);
+						focusor.SetActive (true);
+						helpTextContainer.transform.localPosition = new Vector3 (-150, 97, 0);
+						tutorialText.text = "Press either button once (do not hold) " +
+						"to select a tag";
+						tutorialText.GetComponent<RectTransform> ().sizeDelta 
+						= new Vector2 (330, 65);
+						helpTextPanel.GetComponent<RectTransform> ().sizeDelta
+						= new Vector2 (330, 20f);
+						tutorialText.transform.localPosition 
+						= new Vector3 (0, -25f, 0);
+						stepOfTutorial++;
+					} else {
+						secondTutorialArrow.SetActive (false);
+						stepOfTutorial += 2;
+					}
 				}
 				
 			} else if (stepOfTutorial == 4) { //Step where user selects highlighted tags:
@@ -379,7 +387,14 @@ public class MakeWordBank : MonoBehaviour {
 					= new Vector2 (310, 40f);
 					tutorialText.transform.localPosition 
 					= new Vector3 (40, -15, 0);
+					if (skipTaggingTutorialStep) {
+						tutorialText.transform.localPosition 
+						= new Vector3 (95, -15, 0);
+					}
 					stepOfTutorial++;
+					if (skipTrashingTutorialStep) {
+						stepOfTutorial += 3;
+					}
 				}
 			} else if (stepOfTutorial == 6) { //Showing tags left label:
 				if (buttons > 0 && buttonsPrev == 0) { //Change this for the falcon
@@ -429,7 +444,7 @@ public class MakeWordBank : MonoBehaviour {
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 9) {
-				if (state.getSelected() == null) { //user dropped tag into bin
+				if (!skipTrashingTutorialStep && state.getSelected() == null || skipTrashingTutorialStep && (buttons > 0 && buttonsPrev == 0)) { //user dropped tag into bin
 					tutorialText.fontSize = 12;
 					tutorialText.GetComponent<RectTransform> ().sizeDelta
 					= new Vector2 (400, 40f);
@@ -452,8 +467,18 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
 					welcomeScreen.SetActive (true);
-					welcomeText.text = "Now let's do a practice level.\n" +
+					if (skipTaggingTutorialStep) { //If you're the trasher:
+						welcomeText.text = "Now let's do a practice level.\n" +
+							"You will discard five tags that you can't find in the image.\n" +
+							"(Press any button to begin the practice level)";
+					} else if (skipTrashingTutorialStep) { //you're the tagger:
+						welcomeText.text = "Now let's do a practice level.\n" +
+						"You will place five tags onto the image.\n" +
+						"(Press any button to begin the practice level)";
+					} else { //Single player:
+						welcomeText.text = "Now let's do a practice level.\n" +
 						"It will be just like a real level but data will not be collected.\n(Press any button to begin the practice level)";
+					}
 					stepOfTutorial++;
 				}
 			} else if (stepOfTutorial == 11) {
@@ -542,7 +567,7 @@ public class MakeWordBank : MonoBehaviour {
 				}
 			}
 		}
-		if (clickedImage) {
+		if (clickedImage || (skipTaggingTutorialStep && inPracticeLevel) || (skipTaggingTutorialStep && continueAfterOtherQuit)) { //If they're the trasher, the practice level should turn over tags left.
 			//Handle tags remaining label, image turnover, here:
 			if (numTagsRemaining > 2) { //Plural "tags remaining" vs singular "tag remaining" (minor detail):
 				numTagsRemaining--;
@@ -559,11 +584,13 @@ public class MakeWordBank : MonoBehaviour {
 						if (!inPracticeLevel) { //Are we not in the practice level:
 							DataCollector.Flush ();
 						}
-						Transform lastTag = tagSphere.transform.GetChild (tagSphere.transform.childCount - 1);
+						if (!skipTaggingTutorialStep) { //Only set these if you're the tagger:
+							Transform lastTag = tagSphere.transform.GetChild (tagSphere.transform.childCount - 1);
 
-						positionLastTag = lastTag.localPosition;
-						rotationLastTag = lastTag.localRotation.eulerAngles;
-						scaleLastTag = lastTag.localScale;
+							positionLastTag = lastTag.localPosition;
+							rotationLastTag = lastTag.localRotation.eulerAngles;
+							scaleLastTag = lastTag.localScale;
+						}
 
 						foreach (Transform t in tagSphere.transform) {
 							Destroy (t.gameObject, 0.08f);

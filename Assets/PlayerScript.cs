@@ -17,7 +17,7 @@ public class PlayerScript : NetworkBehaviour {
 	///**************
 	/// jointTermination is the only variable needed to change to make it either both users end at once or one keeps playing
 	/// 
-	bool jointTermination = true;
+	bool jointTermination = false;
 	///
 	///**************
 
@@ -51,12 +51,13 @@ public class PlayerScript : NetworkBehaviour {
 				if (MakeWordBank.waitingForOtherPlayer) {
 					RpcAskClientIfFinishedTutorial ();
 				}
+				if (!taggerPanelIsSet) {
+					MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, -5000, 0));
+					MakeWordBank.skipTrashingTutorialStep = true;
+					taggerPanelIsSet = true;
+				}
 
 				if (finishedWaiting) { //Playing the game:
-					if (!taggerPanelIsSet) {
-						MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, -5000, 0));
-						taggerPanelIsSet = true;
-					}
 					//Tell client (trasher) when the tagger is holding a tag:
 					if (ClickAction.state.getSelected ()) {
 						nameLastTag = ClickAction.state.getSelected ().GetComponent<Text> ().text;
@@ -89,7 +90,7 @@ public class PlayerScript : NetworkBehaviour {
 								MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, 5000, 0));
 								RpcQuitGame ();
 							} else {
-								/////////
+								RpcContinuePlaying ();
 							}
 							terminated = true;
 						}
@@ -99,11 +100,14 @@ public class PlayerScript : NetworkBehaviour {
 				if (MakeWordBank.otherPlayerHasFinished) {
 					CmdTellServerClientIsFinished ();
 				}
+
+				if (!trasherPanelIsSet) {
+					MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, -5000, 0));
+					MakeWordBank.skipTaggingTutorialStep = true;
+					trasherPanelIsSet = true;
+				}
+
 				if (finishedWaiting) {
-					if (!trasherPanelIsSet) {
-						MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, -5000, 0));
-						trasherPanelIsSet = true;
-					}
 					//**********
 					//Potential glitch: trasher trashes a tag and before the signal can reach the tagger, the tagger picks it up.
 					//In this case, it'll be the one time the trasher overrules the tagger (makes sense this way and is probably gonna be easier to implement)
@@ -125,7 +129,7 @@ public class PlayerScript : NetworkBehaviour {
 								MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
 								CmdQuitGame ();
 							} else {
-								/////////
+								CmdContinuePlaying ();
 							}
 							terminated = true;
 						}
@@ -289,6 +293,29 @@ public class PlayerScript : NetworkBehaviour {
 	void CmdQuitGame() {
 		if (!SubmitFinalQuestionScript.startListening) {
 			QuitGameScript.TaskOnClick ();
+		}
+	}
+
+	[Command]
+	void CmdContinuePlaying() { //Independent termination:
+		MakeWordBank.practiceLevelText.SetActive(true); //For convenience, the text object practiceLevelText will be the text that says the other person quit
+		MakeWordBank.practiceLevelText.transform.localPosition = new Vector3(248.9f, -54.5f, 0f);
+		MakeWordBank.practiceLevelText.GetComponent<RectTransform> ().sizeDelta
+		= new Vector2 (270.36f, 30f);
+		MakeWordBank.practiceLevelText.GetComponent<Text> ().fontSize = 10;
+		MakeWordBank.practiceLevelText.GetComponent<Text> ().text = "The other party has left the session";
+	}
+
+	[ClientRpc]
+	void RpcContinuePlaying() {
+		if (!isServer) {
+			MakeWordBank.practiceLevelText.SetActive(true); //For convenience, the text object practiceLevelText will be the text that says the other person quit
+			MakeWordBank.practiceLevelText.transform.localPosition = new Vector3(248.9f, -54.5f, 0f);
+			MakeWordBank.practiceLevelText.GetComponent<RectTransform> ().sizeDelta
+			= new Vector2 (270.36f, 30f);
+			MakeWordBank.practiceLevelText.GetComponent<Text> ().fontSize = 10;
+			MakeWordBank.practiceLevelText.GetComponent<Text> ().text = "The other party has left the session";
+			MakeWordBank.continueAfterOtherQuit = true;
 		}
 	}
 }
