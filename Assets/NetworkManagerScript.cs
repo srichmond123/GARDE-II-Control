@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class NetworkManagerScript : NetworkBehaviour {
+public class NetworkManagerScript : MonoBehaviour {
 	public static bool hudOff = false;
 	NetworkManagerHUD hd;
 	// Use this for initialization
