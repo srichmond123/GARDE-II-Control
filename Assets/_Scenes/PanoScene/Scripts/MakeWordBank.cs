@@ -584,8 +584,10 @@ public class MakeWordBank : MonoBehaviour {
 				}
 			} else {
 				numTagsRemaining--;
-				if (numTagsRemaining == 1 && !(skipTaggingTutorialStep && inPracticeLevel)) {
-					tagsRemainingText.text = numTagsRemaining + " Tag Left";
+				if (numTagsRemaining == 1) { 
+					if (!(skipTaggingTutorialStep && inPracticeLevel)) {
+						tagsRemainingText.text = numTagsRemaining + " Tag Left";
+					}
 				} else {
 					if (imageIndex == imageMaterials.Length - 1) { //On last image, then quit:
 						QuitGameScript.quitGame();
