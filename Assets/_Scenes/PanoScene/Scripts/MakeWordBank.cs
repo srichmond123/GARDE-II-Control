@@ -623,6 +623,7 @@ public class MakeWordBank : MonoBehaviour {
 						sequenceIndex = 0;
 						for (int tagsIndex = 0; tagsIndex < tags.Length; tagsIndex++) {
 							tags [tagsIndex].setText (wordBank [SEQUENCE [imageIndex, sequenceIndex]]);
+							tags [tagsIndex].text.color = Color.black;
 							sequenceIndex++;
 						}
 						if (inPracticeLevel) {
