@@ -48,6 +48,7 @@ public class PlayerScript : NetworkBehaviour {
 			
 		if (frame > 3) { //This is done to not slow network traffic by calling commands every frame
 			if (isServer) {
+				NetworkManagerScript.hudOff = true;
 				if (MakeWordBank.waitingForOtherPlayer) {
 					RpcAskClientIfFinishedTutorial ();
 				}
@@ -97,6 +98,7 @@ public class PlayerScript : NetworkBehaviour {
 					}
 				}
 			} else {
+				NetworkManagerScript.hudOff = true;
 				if (MakeWordBank.otherPlayerHasFinished) {
 					CmdTellServerClientIsFinished ();
 				}

@@ -381,8 +381,13 @@ public class MakeWordBank : MonoBehaviour {
 					tutorialArrow.SetActive (true);
 					tutorialArrow.transform.localPosition = new Vector3 (90, 120, 0);
 					//tutorialText.fontSize = 11;
-					tutorialText.text = "After 5 tags are used, the image will be replaced.\n" +
-					"(Press any button to continue)";
+					if (skipTrashingTutorialStep) {
+						tutorialText.text = "After you place 5 tags, the image will be replaced.\n" +
+						"(Press any button to continue)";
+					} else {
+						tutorialText.text = "After your peer places 5 tags, the image will be replaced.\n" +
+							"(Press any button to continue)";
+					}
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
 					= new Vector2 (310, 40f);
 					tutorialText.transform.localPosition 
@@ -571,10 +576,15 @@ public class MakeWordBank : MonoBehaviour {
 			//Handle tags remaining label, image turnover, here:
 			if (numTagsRemaining > 2) { //Plural "tags remaining" vs singular "tag remaining" (minor detail):
 				numTagsRemaining--;
-				tagsRemainingText.text = numTagsRemaining + " Tags Left";
+
+				if (skipTaggingTutorialStep && inPracticeLevel) {
+					
+				} else {
+					tagsRemainingText.text = numTagsRemaining + " Tags Left";
+				}
 			} else {
 				numTagsRemaining--;
-				if (numTagsRemaining == 1) {
+				if (numTagsRemaining == 1 && !(skipTaggingTutorialStep && inPracticeLevel)) {
 					tagsRemainingText.text = numTagsRemaining + " Tag Left";
 				} else {
 					if (imageIndex == imageMaterials.Length - 1) { //On last image, then quit:
