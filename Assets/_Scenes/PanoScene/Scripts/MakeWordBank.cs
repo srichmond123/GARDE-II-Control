@@ -608,6 +608,7 @@ public class MakeWordBank : MonoBehaviour {
 
 						if (ClickAction.cursorTag != null) {
 							Destroy (ClickAction.cursorTag);
+							ClickAction.cursorTag = null;
 						}
 
 						foreach (Transform t in tagSphere.transform) {
