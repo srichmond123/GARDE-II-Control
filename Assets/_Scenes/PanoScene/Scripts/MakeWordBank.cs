@@ -606,6 +606,10 @@ public class MakeWordBank : MonoBehaviour {
 							scaleLastTag = lastTag.localScale;
 						}
 
+						if (ClickAction.cursorTag != null) {
+							Destroy (ClickAction.cursorTag);
+						}
+
 						foreach (Transform t in tagSphere.transform) {
 							Destroy (t.gameObject, 0.08f);
 						}
