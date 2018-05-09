@@ -385,7 +385,7 @@ public class MakeWordBank : MonoBehaviour {
 						tutorialText.text = "After you place 5 tags, the image will be replaced.\n" +
 							"(Press any button to continue)";
 					} else {
-						tutorialText.text = "After your peer places 5 tags, the image will be replaced.\n" +
+						tutorialText.text = "After your peer places 5 tags, the image will be\nreplaced. " +
 							"(Press any button to continue)";
 					}
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
@@ -564,6 +564,9 @@ public class MakeWordBank : MonoBehaviour {
 						sequenceIndex++;
 					} else {
 						if (clickedImage) {
+							tags [i].isChangingColor = true;
+							tags [i].text.color = Color.clear;
+
 							tags [i].setText ("");
 						} else {
 							//Do nothing so you can't throw away tags when there's nothing to replace them
