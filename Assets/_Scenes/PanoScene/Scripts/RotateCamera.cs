@@ -6,7 +6,7 @@ public class RotateCamera : MonoBehaviour
 	private Vector3 falconpos;
 	private Vector3 nextpos;
 
-	public float sensitivity = 5f;
+	public float sensitivity = 1f;
 	private float zoom;
 
 	private bool[] buttons;

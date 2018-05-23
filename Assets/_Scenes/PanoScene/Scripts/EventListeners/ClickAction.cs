@@ -85,14 +85,14 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
             }
             state.setSelected(objectClicked);
 
-			if (MakeWordBank.trasherPanel.transform.localPosition.y >= 3000) { //If the player doesn't have a panel blocking putting tags on the image:
+			//if (MakeWordBank.trasherPanel.transform.localPosition.y >= 3000) { //If the player doesn't have a panel blocking putting tags on the image:
 				objectClicked.GetComponentInChildren<Text> ().color = Color.red;
 				for (int i = 0; i < MakeWordBank.tags.Length; i++) {
 					if (objectClicked.GetComponentInChildren<Text> ().text.Equals (MakeWordBank.tags [i].getText ())) {
 						MakeWordBank.tags [i].isChangingColor = false;
 					}
 				}
-			}
+			//}
 
 			if (cursorTag != null) {
 				Destroy (cursorTag);
