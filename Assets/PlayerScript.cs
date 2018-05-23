@@ -9,8 +9,8 @@ public class PlayerScript : NetworkBehaviour {
 
 	private static bool finishedWaiting = false; //Once this is true, client and server should be playing together and constantly sending signals back and forth
 	//private static bool holdingATag = false;
-	private static string holdingTag = ""; //The tag's unique name in the wordbank, like Tag0, Tag9
-	private static string trashedTagText = "";
+	public static string holdingTag = ""; //The tag's unique name in the wordbank, like Tag0, Tag9
+	public static string trashedTagText = "";
 	private static string nameLastTag = "";
 	private static bool terminated = false; //To prevent the final question from coming up over and over upon termination
 
@@ -172,7 +172,8 @@ public class PlayerScript : NetworkBehaviour {
 			}
 			if (ClickAction.state.getSelected ()) { //Check if the trasher is holding the same tag as the server: if not, do nothing:
 				string trasherTagHeld = ClickAction.state.getSelected ().GetComponent<Text> ().text;
-				if (trasherTagHeld.Equals (name)) {
+                ClickAction.state.getSelected().GetComponent<Text>().color = Color.red;
+                if (trasherTagHeld.Equals (name)) {
 					holdingTag = "";
 					ClickAction.state.setSelected (null);
 					Destroy (ClickAction.cursorTag);
@@ -197,6 +198,7 @@ public class PlayerScript : NetworkBehaviour {
         }
         if (ClickAction.state.getSelected()) {
             string taggerTagHeld = ClickAction.state.getSelected().GetComponent<Text>().text;
+            ClickAction.state.getSelected().GetComponent<Text>().color = Color.red;
             if (taggerTagHeld.Equals(name)) {
                 RpcTellClientTagIsHeld(name);
             }
@@ -240,7 +242,8 @@ public class PlayerScript : NetworkBehaviour {
 
 	[Command]
 	void CmdTellServerThrowAwayTag(string tagText, string uniqueTagName) {
-		//Server could have just then clicked on the tag that was thrown away:
+		//Nevermind:
+        /*
 		for (int i = 0; i < MakeWordBank.tags.Length; i++) {
 			if (MakeWordBank.tags [i].getText ().Equals (tagText)) {
 				if (MakeWordBank.tags [i].text.color == Color.red) { //If they just then clicked on it, deselect it for tagger:
@@ -257,6 +260,7 @@ public class PlayerScript : NetworkBehaviour {
 				}
 			}
 		}
+        */
 
 		GameObject objToInstantiate = null; //Object to put under trash can:
 		for (int i = 0; i < MakeWordBank.tags.Length; i++) {

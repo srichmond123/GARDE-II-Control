@@ -646,6 +646,9 @@ public class MakeWordBank : MonoBehaviour {
 						if (ClickAction.cursorTag != null) {
 							Destroy (ClickAction.cursorTag);
 							ClickAction.cursorTag = null;
+                            PlayerScript.holdingTag = "";
+                            PlayerScript.trashedTagText = "";
+                            ClickAction.state.setSelected(null);
 						}
 
 						foreach (Transform t in tagSphere.transform) {
