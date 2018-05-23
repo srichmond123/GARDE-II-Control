@@ -117,6 +117,7 @@ public class PlayerScript : NetworkBehaviour {
 					if (ClickAction.state.getSelected ()) {
 						holdingTag = ClickAction.state.getSelected ().GetComponent<Text> ().name;
 						trashedTagText = ClickAction.state.getSelected ().GetComponent<Text> ().text;
+                        CmdTellServerTagIsHeld(trashedTagText);
 					} else {
 						if (!holdingTag.Equals ("")) { //Means trasher has just dropped a tag into the trash:
 							CmdTellServerThrowAwayTag(trashedTagText, holdingTag);
@@ -165,7 +166,7 @@ public class PlayerScript : NetworkBehaviour {
 			for (int i = 0; i < MakeWordBank.tags.Length; i++) {
 				if (MakeWordBank.tags [i].getText ().Equals (name)) {
 					MakeWordBank.tags [i].text.color = Color.red;
-				} else {
+				} else if (!MakeWordBank.tags[i].getText().Equals(trashedTagText)) {
 					MakeWordBank.tags [i].text.color = Color.black;
 				}
 			}
@@ -180,6 +181,27 @@ public class PlayerScript : NetworkBehaviour {
 			}
 		}
 	}
+
+    [Command]
+    void CmdTellServerTagIsHeld(string name) {
+        for (int i = 0; i < MakeWordBank.tags.Length; i++)
+        {
+            if (MakeWordBank.tags[i].getText().Equals(name))
+            {
+                MakeWordBank.tags[i].text.color = Color.red;
+            }
+            else if (!MakeWordBank.tags[i].getText().Equals(nameLastTag))
+            {
+                MakeWordBank.tags[i].text.color = Color.black;
+            }
+        }
+        if (ClickAction.state.getSelected()) {
+            string taggerTagHeld = ClickAction.state.getSelected().GetComponent<Text>().text;
+            if (taggerTagHeld.Equals(name)) {
+                RpcTellClientTagIsHeld(name);
+            }
+        }
+    }
 
 	[ClientRpc]
 	void RpcAddTagToSphere (Vector3 position, string name, string tagUniqueName) {

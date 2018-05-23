@@ -456,18 +456,54 @@ public class MakeWordBank : MonoBehaviour {
 					helpTextPanel.GetComponent<RectTransform> ().sizeDelta
 					= new Vector2 (370, 40f);
 					tutorialText.text
-					= "You can quit any time you want by pressing the Quit button.\n" +
+					= "If your peer has a tag selected, it will highlight red and you\nwill not be able to take it." +
 					"(Press any button to continue)";
+                    for (int i = 0; i < tags.Length; i++)
+                    {
+                        if (tags[i].text.name.Equals("Tag2"))
+                        {
+                            tags[i].text.color = Color.red;
+                        }
+                    }
 					focusor.SetActive (false);
 					tutorialArrow.SetActive (true);
-					tutorialArrow.transform.localEulerAngles = new Vector3 (0f, 0f, -90f);
-					helpTextContainer.transform.localPosition = new Vector3 (-29, -20, 0);
-					tutorialArrow.transform.localPosition = new Vector3 (128, -110, 0);
+					tutorialArrow.transform.localEulerAngles = new Vector3 (0f, 0f, -60f);
+					helpTextContainer.transform.localPosition = new Vector3 (-235.3f, 147.7f, 0);
+					tutorialArrow.transform.localPosition = new Vector3 (60, 100, 0);
 					tutorialText.transform.localPosition 
 					= new Vector3 (21, -4, 0);
 					stepOfTutorial++;
 				}
-			} else if (stepOfTutorial == 10) { //Last element of tutorial, reshowing welcome screen basically
+			} else if (stepOfTutorial == 10)
+            {
+                if (buttons > 0 && buttonsPrev == 0)
+                {
+                    for (int i = 0; i < tags.Length; i++)
+                    {
+                        if (tags[i].text.name.Equals("Tag2"))
+                        {
+                            tags[i].text.color = Color.black;
+                        }
+                    }
+                    tutorialText.fontSize = 12;
+                    tutorialText.GetComponent<RectTransform>().sizeDelta
+                    = new Vector2(400, 40f);
+                    helpTextPanel.GetComponent<RectTransform>().sizeDelta
+                    = new Vector2(370, 40f);
+                    tutorialText.text
+                    = "You can quit any time you want by pressing the Quit button.\n" +
+                    "(Press any button to continue)";
+                    focusor.SetActive(false);
+                    tutorialArrow.SetActive(true);
+                    tutorialArrow.transform.localEulerAngles = new Vector3(0f, 0f, -90f);
+                    helpTextContainer.transform.localPosition = new Vector3(-29, -20, 0);
+                    tutorialArrow.transform.localPosition = new Vector3(128, -110, 0);
+                    tutorialText.transform.localPosition
+                    = new Vector3(21, -4, 0);
+                    stepOfTutorial++;
+                }
+            }
+            else if (stepOfTutorial == 11) { //Last element of tutorial, reshowing welcome screen basically
 				if (buttons > 0 && buttonsPrev == 0) {
 					tutorialArrow.SetActive(false);
 					helpTextContainer.SetActive (false);
@@ -486,7 +522,7 @@ public class MakeWordBank : MonoBehaviour {
 					}
 					stepOfTutorial++;
 				}
-			} else if (stepOfTutorial == 11) {
+			} else if (stepOfTutorial == 12) {
 				if (buttons > 0 && buttonsPrev == 0) { //Change for falcon
 					//END OF TUTORIAL:
 					inTutorial = false;

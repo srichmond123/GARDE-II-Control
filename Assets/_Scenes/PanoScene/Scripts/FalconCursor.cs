@@ -13,7 +13,7 @@ public class FalconCursor : MonoBehaviour
 
 	private bool[] buttons;
 
-	public float sensitivity = 1f;
+	public float sensitivity = 0.7f;
 
 	private void Start()
 	{
