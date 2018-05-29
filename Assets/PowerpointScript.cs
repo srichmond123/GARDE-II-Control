@@ -40,7 +40,7 @@ public class PowerpointScript : MonoBehaviour {
 						delay = 0f;
 						transitionTime = 1f;
 					} else { //Wait for keystroke
-						if (Input.anyKeyDown) {
+						if (Input.anyKeyDown && !Input.GetKeyDown(KeyCode.BackQuote)) {
 							slideIndex++;
 							delay = 0f;
 							transitionTime = 0.75f;
