@@ -75,6 +75,10 @@ public class ClickAction : MonoBehaviour, IPointerClickHandler
 			if (objectClicked.GetComponentInChildren<Text> ().color == Color.red) {
 				return; //Prevents trasher from clicking on a tag the tagger has selected in multiplayer
 			}
+            if (objectClicked.GetComponent<Text>() != null && objectClicked.GetComponent<Text>().color == Color.red)
+            {
+                return;
+            }
 
             Debug.Log(objectClicked.name); // Name of the object
             GameObject currentTag = state.getSelected();
