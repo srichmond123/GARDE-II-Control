@@ -5,6 +5,7 @@ using UnityEngine.Networking;
 
 public class NetworkManagerScript : MonoBehaviour {
 	public static bool hudOff = false;
+    public static bool turnedOff = false;
 	NetworkManagerHUD hd;
 	// Use this for initialization
 	void Start () {
@@ -14,7 +15,16 @@ public class NetworkManagerScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (hudOff && hd.enabled) {
-			hd.enabled = false;
+			if (!turnedOff)
+            {
+                hd.enabled = false;
+                turnedOff = true;
+            }
 		}
+        if (Input.GetKeyDown(KeyCode.BackQuote))
+        {
+            hd.enabled = !hd.enabled;
+            hudOff = !hd.enabled;
+        }
 	}
 }

@@ -48,7 +48,10 @@ public class PlayerScript : NetworkBehaviour {
 			
 		if (frame > 3) { //This is done to not slow network traffic by calling commands every frame
 			if (isServer) {
-				NetworkManagerScript.hudOff = true;
+                if (!NetworkManagerScript.turnedOff)
+                {
+				    NetworkManagerScript.hudOff = true;
+                }
 				if (MakeWordBank.waitingForOtherPlayer) {
 					RpcAskClientIfFinishedTutorial ();
 				}
@@ -85,7 +88,7 @@ public class PlayerScript : NetworkBehaviour {
 							holdingTag = "";
 						}
 					}
-					if (SubmitFinalQuestionScript.startListening) { //Means the server is quitting currently:
+					if (SubmitFinalQuestionScript.isListening) { //Means the server is quitting currently:
 						if (!terminated) {
 							if (jointTermination) {
 								MakeWordBank.taggerPanel.transform.Translate (new Vector3 (0, 5000, 0));
@@ -98,8 +101,11 @@ public class PlayerScript : NetworkBehaviour {
 					}
 				}
 			} else {
-				NetworkManagerScript.hudOff = true;
-				if (MakeWordBank.otherPlayerHasFinished) {
+                if (!NetworkManagerScript.turnedOff)
+                {
+                    NetworkManagerScript.hudOff = true;
+                }
+                if (MakeWordBank.otherPlayerHasFinished) {
 					CmdTellServerClientIsFinished ();
 				}
 
@@ -126,7 +132,7 @@ public class PlayerScript : NetworkBehaviour {
 							holdingTag = "";
 						}
 					}
-					if (SubmitFinalQuestionScript.startListening) { //Client has quit
+					if (SubmitFinalQuestionScript.isListening) { //Client has quit
 						if (!terminated) {
 							if (jointTermination) {
 								MakeWordBank.trasherPanel.transform.Translate (new Vector3 (0, 5000, 0));
@@ -315,7 +321,7 @@ public class PlayerScript : NetworkBehaviour {
 	[ClientRpc]
 	void RpcQuitGame() {
 		if (!isServer) {
-			if (!SubmitFinalQuestionScript.startListening) { //So this isn't done twice
+			if (!SubmitFinalQuestionScript.isListening) { //So this isn't done twice
 				QuitGameScript.TaskOnClick ();
 			}
 		}
@@ -323,7 +329,7 @@ public class PlayerScript : NetworkBehaviour {
 
 	[Command]
 	void CmdQuitGame() {
-		if (!SubmitFinalQuestionScript.startListening) {
+		if (!SubmitFinalQuestionScript.isListening) {
 			QuitGameScript.TaskOnClick ();
 		}
 	}

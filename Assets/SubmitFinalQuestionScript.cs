@@ -9,6 +9,7 @@ public class SubmitFinalQuestionScript : MonoBehaviour {
 	public Slider slide;
     public Slider slide2;
 	public static bool startListening = false;
+    public static bool isListening = false;
 	bool notAwake = true;
 
 	void Start() {
@@ -19,6 +20,7 @@ public class SubmitFinalQuestionScript : MonoBehaviour {
 		if (startListening) {
 			Button btn = gameObject.GetComponent<Button> ();
 			btn.onClick.AddListener (TaskOnClick);
+            isListening = true;
 			startListening = false;
 		}
 	}
